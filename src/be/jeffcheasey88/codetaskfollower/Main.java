@@ -12,7 +12,7 @@ public class Main{
 
 	public static void main(String[] args) throws Exception{
 		
-		Ship ship = new Ship("mysql", new MySQLCompass("localhost", 3306, "code-task-follower", "root", "root"), new DatabaseConfiguration());
+		Ship ship = new Ship("mysql", new MySQLCompass("database", 3306, "code-task-follower", "root", "root"), new DatabaseConfiguration());
 		ship.setSails();
 		
 		Router router = new Router();
