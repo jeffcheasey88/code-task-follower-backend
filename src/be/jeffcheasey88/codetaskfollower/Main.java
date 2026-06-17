@@ -12,7 +12,7 @@ public class Main{
 
 	public static void main(String[] args) throws Exception{
 		
-		Ship ship = new Ship("mysql", new MySQLCompass(null, 0, null, null, null), new DatabaseConfiguration());
+		Ship ship = new Ship("mysql", new MySQLCompass("localhost", 3306, "code-task-follower", "root", "root"), new DatabaseConfiguration());
 		ship.setSails();
 		
 		Router router = new Router();
@@ -39,7 +39,7 @@ public class Main{
 		
 		DependencyInjector injector = new DependencyInjector();
 		router.registerPackages("be.jeffcheasey88.codetaskfollower.controller", injector);
-		router.listen(80, false);
+		router.listen(8001, false);
 	}
 	
 }
