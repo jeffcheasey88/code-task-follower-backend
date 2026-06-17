@@ -6,7 +6,7 @@ import dev.peerat.mapping.Treasure;
 @Treasure
 public class Branch{
 
-	@Key private int id;
+	@Key(auto=true) private int id;
 	private String repositoryName;
 	private String branchName;
 	

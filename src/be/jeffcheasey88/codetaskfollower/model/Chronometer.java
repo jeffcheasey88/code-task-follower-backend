@@ -8,7 +8,7 @@ import dev.peerat.mapping.Treasure;
 @Treasure
 public class Chronometer{
 
-	@Key private int id;
+	@Key(auto=true) private int id;
 	private int seconds;
 	private List<ChronomterPart> parts;
 	

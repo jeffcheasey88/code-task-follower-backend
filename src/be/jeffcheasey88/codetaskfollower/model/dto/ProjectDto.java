@@ -2,21 +2,13 @@ package be.jeffcheasey88.codetaskfollower.model.dto;
 
 import java.util.List;
 
-public class StateDto{
+public class ProjectDto{
 	private int id;
 	private String name;
 	private String color;
-	public StateDto(int id, String name, String color){
-		this.id = id;
-		this.name = name;
-		this.color = color;
-	}
-	public void setId(int id){
-		this.id = id;
-	}
-	public int getId(){
-		return this.id;
-	}
+	private List<TagDto> tags;
+	private List<TaskDto> tasks;
+	private List<BranchDto> branches;
 	public void setName(String name){
 		this.name = name;
 	}

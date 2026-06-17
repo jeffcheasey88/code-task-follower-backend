@@ -8,7 +8,7 @@ import dev.peerat.mapping.Treasure;
 @Treasure
 public class Commit{
 
-	@Key private int id;
+	@Key(auto=true) private int id;
 	private String hash;
 	private List<Task> tasks;
 	

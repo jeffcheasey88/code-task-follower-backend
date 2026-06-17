@@ -8,7 +8,7 @@ import dev.peerat.mapping.Treasure;
 @Treasure
 public class Task{
 
-	@Key private int id;
+	@Key(auto=true) private int id;
 	private String name;
 	private State state;
 	private List<Tag> tags;

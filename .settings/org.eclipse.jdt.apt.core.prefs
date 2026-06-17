@@ -1,11 +1,13 @@
 eclipse.preferences.version=1
 org.eclipse.jdt.apt.aptEnabled=true
-org.eclipse.jdt.apt.genSrcDir=.apt_generated
-org.eclipse.jdt.apt.genTestSrcDir=.apt_generated_tests
+org.eclipse.jdt.apt.genSrcDir=.orm_generated
+org.eclipse.jdt.apt.genTestSrcDir=.orm_generated_tests
 org.eclipse.jdt.apt.processorOptions/treasure.dependencies=mysql-connector-j-9.4.0.jar;peer-at-code-framework-1.2.0.jar;Treasure.jar
 org.eclipse.jdt.apt.processorOptions/treasure.dto.name={0}Dto
 org.eclipse.jdt.apt.processorOptions/treasure.dto.package=be.jeffcheasey88.codetaskfollower.model.dto
+org.eclipse.jdt.apt.processorOptions/treasure.java.home=C\:\\Program Files\\Java\\jdk-25
 org.eclipse.jdt.apt.processorOptions/treasure.java.version=25
+org.eclipse.jdt.apt.processorOptions/treasure.mysql.schema=true
 org.eclipse.jdt.apt.processorOptions/treasure.providers=dev.peerat.mapping.providers.mysql.MySQLProvider
 org.eclipse.jdt.apt.processorOptions/treasure.source=%sourcepath%
 org.eclipse.jdt.apt.reconcileEnabled=true

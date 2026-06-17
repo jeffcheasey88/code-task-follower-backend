@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import be.jeffcheasey88.codetaskfollower.model.Tag;
 import be.jeffcheasey88.codetaskfollower.model.dto.TagDto;
 import dev.peerat.framework.routes.Route;
+import dev.peerat.mapping.TreasureCache;
 
 public class TagController{
 	
@@ -29,7 +30,7 @@ public class TagController{
 	}
 	
 	@Route(path = "/tags/(\\d+)", type = DELETE)
-	public void deleteTag(Matcher matcher, TagDto tagDto){
-		//TODO
+	public void deleteTag(Matcher matcher){
+		TreasureCache.delete(Tag.getTag(Integer.parseInt(matcher.group(1))));
 	}
 }

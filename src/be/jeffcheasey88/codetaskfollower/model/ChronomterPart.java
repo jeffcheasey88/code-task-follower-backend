@@ -6,7 +6,7 @@ import dev.peerat.mapping.Treasure;
 @Treasure
 public class ChronomterPart{
 
-	@Key private int id;
+	@Key(auto=true) private int id;
 	private int seconds;
 	private String description;
 	

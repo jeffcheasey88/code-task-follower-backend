@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import be.jeffcheasey88.codetaskfollower.model.State;
 import be.jeffcheasey88.codetaskfollower.model.dto.StateDto;
 import dev.peerat.framework.routes.Route;
+import dev.peerat.mapping.TreasureCache;
 
 public class StateController{
 	
@@ -32,8 +33,8 @@ public class StateController{
 	}
 	
 	@Route(path = "/states/(\\d+)", type = DELETE)
-	public void deleteState(Matcher matcher, StateDto stateDto){
-		//TODO
+	public void deleteState(Matcher matcher){
+		TreasureCache.delete(State.getState(Integer.parseInt(matcher.group(1))));
 	}
 
 }

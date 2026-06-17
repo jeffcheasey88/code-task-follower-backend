@@ -9,7 +9,7 @@ import dev.peerat.mapping.TreasureCache;
 @Treasure
 public class State{
 
-	@Key private int id;
+	@Key(auto=true) private int id;
 	private String name;
 	private String color;
 	
