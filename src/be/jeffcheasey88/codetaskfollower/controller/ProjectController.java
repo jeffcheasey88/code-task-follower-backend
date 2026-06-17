@@ -12,9 +12,9 @@ public class ProjectController{
 	
 	@Route(path = "/projects/(\\d+)", type = PUT)
 	public void editTag(Matcher matcher, ProjectUpdateDto projectDto){
-		Project project = Project.getProject(Integer.parseInt(matcher.group(1)));
-		project.setName(projectDto.getName());
-		project.setColor(projectDto.getColor());
+//		Project project = Project.getProject(Integer.parseInt(matcher.group(1)));
+//		project.setName(projectDto.getName());
+//		project.setColor(projectDto.getColor());
 	}
 
 }

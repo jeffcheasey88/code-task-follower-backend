@@ -7,6 +7,7 @@ public class ProjectDto{
 	private String name;
 	private String color;
 	private List<TagDto> tags;
+	private List<StateDto> states;
 	private List<TaskDto> tasks;
 	private List<BranchDto> branches;
 	public void setName(String name){

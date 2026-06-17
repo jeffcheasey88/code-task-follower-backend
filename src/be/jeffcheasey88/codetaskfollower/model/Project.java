@@ -13,6 +13,7 @@ public class Project{
 	private String name;
 	private String color;
 	private List<Tag> tags;
+	private List<State> states;
 	private List<Task> tasks;
 	private List<Branch> branches;
 	
@@ -32,8 +33,8 @@ public class Project{
 		return this.color;
 	}
 	
-	public static Project getProject(int id){
-		return TreasureCache.<Project>selectAll().filter(tag -> tag.id == id).get();
-	}
+//	public static Project getProject(int id){
+//		return TreasureCache.<Project>selectAll().filter(tag -> tag.id == id).get();
+//	}
 	
 }
