@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  database:
+    image: mysql:9.7.1
+    container_name: ctf-database
+    environment:
+      MYSQL_DATABASE: code-task-follower
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - database-data:/var/lib/mysql
+    networks:
+      - ctf-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ctf-backend
+    ports:
+      - "8080:8080"
+    networks:
+      - ctf-network
+
+  frontend:
+    build:
+      context: ../code-task-follower-frontend
+      dockerfile: Dockerfile
+    container_name: ctf-frontend
+    ports:
+      - "80:80"
+    networks:
+      - ctf-network
+
+volumes:
+  database-data:
+
+networks:
+  ctf-network:
+    driver: bridge
