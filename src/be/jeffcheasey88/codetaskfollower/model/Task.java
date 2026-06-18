@@ -11,6 +11,7 @@ public class Task{
 	@Key(auto=true) private int id;
 	private String name;
 	private State state;
+	private Chronometer chronometer;
 	private List<Tag> tags;
 	private List<Task> dependencies;
 	private List<Project> projects;

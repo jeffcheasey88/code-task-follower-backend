@@ -6,6 +6,7 @@ public class TaskDto{
 	private int id;
 	private String name;
 	private StateDto state;
+	private ChronometerDto chronometer;
 	private List<TagDto> tags;
 	private List<TaskDto> dependencies;
 	private List<ProjectDto> projects;

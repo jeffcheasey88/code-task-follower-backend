@@ -3,6 +3,7 @@ package be.jeffcheasey88.codetaskfollower;
 import static dev.peerat.framework.RequestType.*;
 
 import be.jeffcheasey88.codetaskfollower.configuration.DatabaseConfiguration;
+import be.jeffcheasey88.codetaskfollower.configuration.Mapper;
 import dev.peerat.framework.Router;
 import dev.peerat.framework.dependency.DependencyInjector;
 import dev.peerat.mapping.Ship;
@@ -22,6 +23,8 @@ public class Main{
 		router.addDefaultHeaders(OPTIONS, "Access-Control-Allow-Methods: *","Access-Control-Allow-Headers: *");
 		
 		router.setDefaultResponse((matcher, context, reader, writer) -> context.response(context.getType().equals(OPTIONS) ? 200 : 404));
+		
+		router.setMapper(new Mapper());
 		
 		new Thread(new Runnable(){
 			public void run(){
