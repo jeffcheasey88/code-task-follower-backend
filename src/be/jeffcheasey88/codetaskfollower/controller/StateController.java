@@ -1,9 +1,6 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
-import static dev.peerat.framework.RequestType.DELETE;
-import static dev.peerat.framework.RequestType.GET;
-import static dev.peerat.framework.RequestType.POST;
-import static dev.peerat.framework.RequestType.PUT;
+import static dev.peerat.framework.RequestType.*;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -30,6 +27,13 @@ public class StateController{
 		State state = State.getState(Integer.parseInt(matcher.group(1)));
 		state.setName(stateDto.getName());
 		state.setColor(stateDto.getColor());
+	}
+	
+	@Route(path = "/states/(\\d+)", type = PATCH)
+	public void editPartialState(Matcher matcher, StateDto stateDto){
+		State state = State.getState(Integer.parseInt(matcher.group(1)));
+		if(stateDto.getName() != null) state.setName(stateDto.getName());
+		if(stateDto.getColor() != null) state.setColor(stateDto.getColor());
 	}
 	
 	@Route(path = "/states/(\\d+)", type = DELETE)
