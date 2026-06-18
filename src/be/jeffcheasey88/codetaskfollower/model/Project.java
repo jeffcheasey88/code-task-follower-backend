@@ -12,7 +12,6 @@ public class Project{
 	@Key(auto=true) private int id;
 	private String name;
 	private String color;
-	private List<Tag> tags;
 	private List<State> states;
 	private List<Task> tasks;
 	private List<Branch> branches;
