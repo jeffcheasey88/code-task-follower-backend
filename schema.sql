@@ -1,121 +1,105 @@
 CREATE TABLE projects(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     name varchar(255),
-    color varchar(255),
-)
+    color varchar(255)
+);
+
+CREATE TABLE states(
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    name varchar(255),
+    color varchar(255)
+);
 
 CREATE TABLE tasks(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     name varchar(255),
     stateId INTEGER,
-    CONSTRAINT fk_state FOREIGN KEY (state) REFERENCES states(id),
-)
+    CONSTRAINT fk_task_state FOREIGN KEY (stateId) REFERENCES states(id)
+);
 
-CREATE TABLE TaskProject{
+CREATE TABLE TaskProject(
     projectId INTEGER,
-    taskId INTEGER,
+    taskId    INTEGER,
     PRIMARY KEY (projectId, taskId),
-    CONSTRAINT fk_project FOREIGN KEY (projectId) REFERENCES projects(id),
-    CONSTRAINT fk_task FOREIGN KEY (taskId) REFERENCES tasks(id),
-}
+    CONSTRAINT fk_taskproject_project FOREIGN KEY (projectId) REFERENCES projects (id),
+    CONSTRAINT fk_taskproject_task FOREIGN KEY (taskId) REFERENCES tasks (id)
+);
 
 CREATE TABLE commits(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    hash varchar(255),
-)
+    hash varchar(255)
+);
 
-CREATE TABLE CommitTask{
+CREATE TABLE CommitTask(
     commitId INTEGER,
-    taskId INTEGER,
+    taskId   INTEGER,
     PRIMARY KEY (commitId, taskId),
-    CONSTRAINT fk_commit FOREIGN KEY (commitId) REFERENCES commits(id),
-    CONSTRAINT fk_task FOREIGN KEY (taskId) REFERENCES tasks(id),
-}
+    CONSTRAINT fk_committask_commit FOREIGN KEY (commitId) REFERENCES commits (id),
+    CONSTRAINT fk_committask_task FOREIGN KEY (taskId) REFERENCES tasks (id)
+);
 
 CREATE TABLE chronometers(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     seconds INTEGER,
     taskId INTEGER,
-    CONSTRAINT fk_task FOREIGN KEY (taskId) REFERENCES tasks(id),
-)
+    CONSTRAINT fk_chronomter_task FOREIGN KEY (taskId) REFERENCES tasks(id)
+);
 
 CREATE TABLE chronomterparts(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     seconds INTEGER,
     description varchar(255),
     chronometerId INTEGER,
-    CONSTRAINT fk_chronometer FOREIGN KEY (chronometerId) REFERENCES chronometers(id),
-)
+    CONSTRAINT fk_chronometerpart_chronometer FOREIGN KEY (chronometerId) REFERENCES chronometers(id)
+);
 
 CREATE TABLE branchs(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     repositoryName varchar(255),
-    branchName varchar(255),
-)
+    branchName varchar(255)
+);
 
-CREATE TABLE TaskBranch{
+CREATE TABLE TaskBranch(
     taskId INTEGER,
     branchId INTEGER,
     PRIMARY KEY (taskId, branchId),
-    CONSTRAINT fk_task FOREIGN KEY (taskId) REFERENCES tasks(id),
-    CONSTRAINT fk_branch FOREIGN KEY (branchId) REFERENCES branchs(id),
-}
+    CONSTRAINT fk_taskbranch_task FOREIGN KEY (taskId) REFERENCES tasks(id),
+    CONSTRAINT fk_taskbranch_branch FOREIGN KEY (branchId) REFERENCES branchs(id)
+);
 
-CREATE TABLE ProjectBranch{
+CREATE TABLE ProjectBranch(
     projectId INTEGER,
     branchId INTEGER,
     PRIMARY KEY (projectId, branchId),
-    CONSTRAINT fk_project FOREIGN KEY (projectId) REFERENCES projects(id),
-    CONSTRAINT fk_branch FOREIGN KEY (branchId) REFERENCES branchs(id),
-}
-
-CREATE TABLE states(
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    name varchar(255),
-    color varchar(255),
-)
-
-CREATE TABLE TaskState{
-    taskId INTEGER,
-    stateId INTEGER,
-    PRIMARY KEY (taskId, stateId),
-    CONSTRAINT fk_task FOREIGN KEY (taskId) REFERENCES tasks(id),
-    CONSTRAINT fk_state FOREIGN KEY (stateId) REFERENCES states(id),
-}
-
-CREATE TABLE ProjectState{
-    projectId INTEGER,
-    stateId INTEGER,
-    PRIMARY KEY (projectId, stateId),
-    CONSTRAINT fk_project FOREIGN KEY (projectId) REFERENCES projects(id),
-    CONSTRAINT fk_state FOREIGN KEY (stateId) REFERENCES states(id),
-}
+    CONSTRAINT fk_projectbranch_project FOREIGN KEY (projectId) REFERENCES projects(id),
+    CONSTRAINT fk_projectbranch_branch FOREIGN KEY (branchId) REFERENCES branchs(id)
+);
 
 CREATE TABLE tags(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     name varchar(255),
-    color varchar(255),
-)
+    color varchar(255)
+);
 
-CREATE TABLE TaskTag{
+CREATE TABLE TaskTag(
     taskId INTEGER,
     tagId INTEGER,
     PRIMARY KEY (taskId, tagId),
-    CONSTRAINT fk_task FOREIGN KEY (taskId) REFERENCES tasks(id),
-    CONSTRAINT fk_tag FOREIGN KEY (tagId) REFERENCES tags(id),
-}
+    CONSTRAINT fk_tasktag_task FOREIGN KEY (taskId) REFERENCES tasks(id),
+    CONSTRAINT fk_tasktag_tag FOREIGN KEY (tagId) REFERENCES tags(id)
+);
 
 CREATE TABLE codes(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     branch INTEGER,
     classPath varchar(255),
-    CONSTRAINT fk_branch FOREIGN KEY (branch) REFERENCES branchs(id),
-)
+    CONSTRAINT fk_code_branch FOREIGN KEY (branch) REFERENCES branchs(id)
+);
 
-CREATE TABLE TaskCode{
+CREATE TABLE TaskCode(
     taskId INTEGER,
     codeId INTEGER,
     PRIMARY KEY (taskId, codeId),
-    CONSTRAINT fk_task FOREIGN KEY (taskId) REFERENCES tasks(id),
-    CONSTRAINT fk_code FOREIGN KEY (codeId) REFERENCES codes(id),
-}
+    CONSTRAINT fk_taskcode_task FOREIGN KEY (taskId) REFERENCES tasks(id),
+    CONSTRAINT fk_taskcode_code FOREIGN KEY (codeId) REFERENCES codes(id)
+);
