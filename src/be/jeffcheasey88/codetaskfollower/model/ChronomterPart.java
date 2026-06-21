@@ -9,5 +9,6 @@ public class ChronomterPart{
 	@Key(auto=true) private int id;
 	private int seconds;
 	private String description;
+	private Chronometer chronometer;
 	
 }

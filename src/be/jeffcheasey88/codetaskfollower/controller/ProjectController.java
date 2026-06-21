@@ -31,6 +31,12 @@ public class ProjectController{
 		return (new Project(0, projectDto.getName(), projectDto.getColor())).getId();
 	}*/
 	
+	//POST /project/						crée un projet
+	//PUT /project/{id}						edit un projet
+	//GET /project/{id}						récupere un projet
+	//GET /project/{id}/tasks/{stateId} 	récupere toutes les tâches d'un certain etat
+	
+	
 	@Route(path = "/projects/(\\d+)", type = PUT)
 	public void editProject(Matcher matcher, ProjectDto projectDto){
 		Project project = ProjectRepository.get(Integer.parseInt(matcher.group(1)));

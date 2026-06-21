@@ -10,6 +10,14 @@ CREATE TABLE states(
     color varchar(255)
 );
 
+CREATE TABLE ProjectStates(
+    projectId INTEGER,
+    stateId    INTEGER,
+    PRIMARY KEY (projectId, stateId),
+    CONSTRAINT fk_projectstate_project FOREIGN KEY (projectId) REFERENCES projects (id),
+    CONSTRAINT fk_projectstate_state FOREIGN KEY (stateId) REFERENCES states (id)
+);
+
 CREATE TABLE tasks(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     name varchar(255),
