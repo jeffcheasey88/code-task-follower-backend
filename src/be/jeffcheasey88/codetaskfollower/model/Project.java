@@ -4,12 +4,25 @@ import java.util.List;
 
 import dev.peerat.mapping.Key;
 import dev.peerat.mapping.Treasure;
-import dev.peerat.mapping.TreasureCache;
 
 @Treasure
-public class Project{
+public class Project {
+
+	public Project(int id, String name, String color) {
+		this.id = id;
+		this.name = name;
+		this.color = color;
+	}
 
 	@Key(auto=true) private int id;
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	private String name;
 	private String color;
 	private List<State> states;
@@ -31,9 +44,5 @@ public class Project{
 	public String getColor(){
 		return this.color;
 	}
-	
-//	public static Project getProject(int id){
-//		return TreasureCache.<Project>selectAll().filter(tag -> tag.id == id).get();
-//	}
 	
 }
