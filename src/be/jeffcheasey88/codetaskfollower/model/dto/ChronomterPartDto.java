@@ -4,4 +4,5 @@ public class ChronomterPartDto{
 	private int id;
 	private int seconds;
 	private String description;
+	private ChronometerDto chronometer;
 }

@@ -10,6 +10,12 @@ import dev.peerat.framework.routes.Route;
 
 public class ProjectController{
 	
+	//POST /project/						crée un projet
+	//PUT /project/{id}						edit un projet
+	//GET /project/{id}						récupere un projet
+	//GET /project/{id}/tasks/{stateId} 	récupere toutes les tâches d'un certain etat
+	
+	
 	@Route(path = "/projects/(\\d+)", type = PUT)
 	public void editTag(Matcher matcher, ProjectUpdateDto projectDto){
 //		Project project = Project.getProject(Integer.parseInt(matcher.group(1)));
