@@ -4,6 +4,7 @@ import static dev.peerat.framework.RequestType.*;
 
 import be.jeffcheasey88.codetaskfollower.configuration.DatabaseConfiguration;
 import be.jeffcheasey88.codetaskfollower.configuration.Mapper;
+import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder;
 import dev.peerat.framework.Router;
 import dev.peerat.framework.dependency.DependencyInjector;
 import dev.peerat.mapping.Ship;
@@ -12,7 +13,6 @@ import dev.peerat.mapping.providers.mysql.MySQLCompass;
 public class Main{
 
 	public static void main(String[] args) throws Exception{
-		
 		Ship ship = new Ship("mysql", new MySQLCompass("database", 3306, "code-task-follower", "root", "root"), new DatabaseConfiguration());
 		ship.setSails();
 		
@@ -25,6 +25,7 @@ public class Main{
 		router.setDefaultResponse((matcher, context, reader, writer) -> context.response(context.getType().equals(OPTIONS) ? 200 : 404));
 		
 		router.setMapper(new Mapper());
+		router.bind(new ModelBinder());
 		
 		new Thread(new Runnable(){
 			public void run(){

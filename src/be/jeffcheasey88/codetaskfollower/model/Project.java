@@ -8,13 +8,26 @@ import dev.peerat.mapping.Treasure;
 @Treasure
 public class Project {
 
+	@Key(auto=true) private int id;
+	private String name;
+	private String color;
+	private List<State> states;
+	private List<Task> tasks;
+	private List<Branch> branches;
+	
 	public Project(int id, String name, String color) {
 		this.id = id;
 		this.name = name;
 		this.color = color;
 	}
-
-	@Key(auto=true) private int id;
+	
+	public Project(int id, String name, String color, List<State> states, List<Task> tasks, List<Branch> branches){
+		this(id, name, color);
+		this.states = states;
+		this.tasks = tasks;
+		this.branches = branches;
+	}
+	
 	public int getId() {
 		return id;
 	}
@@ -22,12 +35,6 @@ public class Project {
 	public void setId(int id) {
 		this.id = id;
 	}
-
-	private String name;
-	private String color;
-	private List<State> states;
-	private List<Task> tasks;
-	private List<Branch> branches;
 	
 	public void setName(String name){
 		this.name = name;

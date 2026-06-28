@@ -1,21 +1,11 @@
 package be.jeffcheasey88.codetaskfollower.model.dto;
 
-import java.util.List;
-
 public class TagDto{
-	private int id;
 	private String name;
 	private String color;
-	public TagDto(int id, String name, String color){
-		this.id = id;
+	public TagDto(String name, String color){
 		this.name = name;
 		this.color = color;
-	}
-	public void setId(int id){
-		this.id = id;
-	}
-	public int getId(){
-		return this.id;
 	}
 	public void setName(String name){
 		this.name = name;

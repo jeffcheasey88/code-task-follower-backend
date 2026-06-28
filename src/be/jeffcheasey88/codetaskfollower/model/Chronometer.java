@@ -12,5 +12,9 @@ public class Chronometer{
 	private int seconds;
 	private List<ChronomterPart> parts;
 	
-	
+	public Chronometer(int id, int seconds, List<ChronomterPart> parts){
+		this.id = id;
+		this.seconds = seconds;
+		this.parts = parts;
+	}
 }

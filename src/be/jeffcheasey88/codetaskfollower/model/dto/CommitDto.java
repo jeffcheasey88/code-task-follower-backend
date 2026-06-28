@@ -6,4 +6,9 @@ public class CommitDto{
 	private int id;
 	private String hash;
 	private List<TaskDto> tasks;
+	public CommitDto(int id, String hash, List<TaskDto> tasks){
+		this.id = id;
+		this.hash = hash;
+		this.tasks = tasks;
+	}
 }

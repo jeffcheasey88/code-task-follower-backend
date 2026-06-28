@@ -22,7 +22,7 @@ public class ProjectController{
 	}
 	
 	@Route(path = "/projects/(\\d+)", type = GET)
-	public Project getProject(Matcher matcher, ProjectDto projectDto){
+	public Project getProject(Matcher matcher){
 		return ProjectRepository.get(Integer.parseInt(matcher.group(1)));
 	}
 

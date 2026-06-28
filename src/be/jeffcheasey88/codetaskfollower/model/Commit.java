@@ -12,4 +12,10 @@ public class Commit{
 	private String hash;
 	private List<Task> tasks;
 	
+	public Commit(int id, String hash, List<Task> tasks){
+		this.id = id;
+		this.hash = hash;
+		this.tasks = tasks;
+	}
+	
 }

@@ -31,6 +31,7 @@ public class TagController{
 	
 	@Route(path = "/tags/(\\d+)", type = DELETE)
 	public void deleteTag(Matcher matcher){
-		TreasureCache.delete(Tag.getTag(Integer.parseInt(matcher.group(1))));
+		Tag tag = Tag.getTag(Integer.parseInt(matcher.group(1)));
+		TreasureCache.delete(tag);
 	}
 }

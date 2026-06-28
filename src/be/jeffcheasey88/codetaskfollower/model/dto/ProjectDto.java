@@ -9,6 +9,23 @@ public class ProjectDto{
 	private List<StateDto> states;
 	private List<TaskDto> tasks;
 	private List<BranchDto> branches;
+	public ProjectDto(int id, String name, String color){
+		this.id = id;
+		this.name = name;
+		this.color = color;
+	}
+	public ProjectDto(int id, String name, String color, List<StateDto> states, List<TaskDto> tasks, List<BranchDto> branches){
+		this(id, name, color);
+		this.states = states;
+		this.tasks = tasks;
+		this.branches = branches;
+	}
+	public int getId(){
+		return id;
+	}
+	public void setId(int id){
+		this.id = id;
+	}
 	public void setName(String name){
 		this.name = name;
 	}

@@ -10,4 +10,9 @@ public class Branch{
 	private String repositoryName;
 	private String branchName;
 	
+	public Branch(int id, String repositoryName, String branchName){
+		this.id = id;
+		this.repositoryName = repositoryName;
+		this.branchName = branchName;
+	}
 }
