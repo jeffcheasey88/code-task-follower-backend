@@ -31,5 +31,11 @@ public class Task{
 		this.branches = branches;
 		this.codes = codes;
 	}
-	
+
+//	public int getId() {
+//		return id;
+//	}
+//	public void setName(String name) {
+//		this.name = name;
+//	}	
 }

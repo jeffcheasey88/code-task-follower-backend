@@ -4,16 +4,19 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.regex.Matcher;
 
+import be.jeffcheasey88.codetaskfollower.exceptions.ClientErrorException;
 import dev.peerat.framework.Context;
 import dev.peerat.framework.HttpReader;
 import dev.peerat.framework.HttpWriter;
+import dev.peerat.framework.RequestType;
 import dev.peerat.framework.json.Json;
 import dev.peerat.framework.json.JsonArray;
 import dev.peerat.framework.json.JsonMap;
 import dev.peerat.framework.routes.ResponseMapper;
+import dev.peerat.framework.routes.responses.ExceptionResponse;
 import dev.peerat.framework.routes.responses.Response;
 
-public class Mapper implements ResponseMapper, Response{
+public class Mapper implements ResponseMapper, Response, ExceptionResponse{
 	
 	public Mapper(){
 		Json.addConverter(o -> {
@@ -59,6 +62,16 @@ public class Mapper implements ResponseMapper, Response{
 	@Override
 	public void execute(Matcher matcher, Context context, HttpReader reader, HttpWriter writer) throws Exception{
 		if(context.getResponseCode() == 0) context.response(200);
+	}
+	
+	@Override
+	public void execute(HttpWriter writer, Throwable throwable, RequestType type, String path) throws Exception {
+		if (throwable instanceof ClientErrorException clientErrorException) {
+			writer.response(clientErrorException.getHttpResponseStatusCode());
+		} else {			
+			System.err.println("\n\nError processing request: [" + type + "] " + path);
+			throwable.printStackTrace();
+		}
 	}
 	
 }

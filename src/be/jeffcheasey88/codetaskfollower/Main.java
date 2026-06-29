@@ -24,7 +24,9 @@ public class Main{
 		
 		router.setDefaultResponse((matcher, context, reader, writer) -> context.response(context.getType().equals(OPTIONS) ? 200 : 404));
 		
-		router.setMapper(new Mapper());
+		Mapper mapper = new Mapper();
+		router.setMapper(mapper);
+		router.setInternalErrorResponse(mapper);
 		router.bind(new ModelBinder());
 		
 		new Thread(new Runnable(){
