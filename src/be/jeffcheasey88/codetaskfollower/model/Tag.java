@@ -43,11 +43,4 @@ public class Tag{
 		return this.color;
 	}
 	
-	public static List<Tag> getTags(){
-		return TreasureCache.<Tag>selectAll().toList();
-	}
-	
-	public static Tag getTag(int id){
-		return TreasureCache.<Tag>selectAll().filter(tag -> tag.id == id).get();
-	}
 }

@@ -3,18 +3,22 @@ package be.jeffcheasey88.codetaskfollower.controller;
 import static dev.peerat.framework.RequestType.*;
 
 import java.util.List;
-import java.util.regex.Matcher;
 
+import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Key;
 import be.jeffcheasey88.codetaskfollower.model.Tag;
 import be.jeffcheasey88.codetaskfollower.model.dto.TagDto;
+import be.jeffcheasey88.codetaskfollower.repository.TagRepository;
+import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
 import dev.peerat.mapping.TreasureCache;
 
 public class TagController{
 	
+	@Injection private TagRepository tagRepository;
+	
 	@Route(path = "/tags", type = GET)
 	public List<Tag> getTags(){
-		return Tag.getTags();
+		return tagRepository.findAll();
 	}
 
 	@Route(path = "/tags", type = POST)
@@ -23,15 +27,13 @@ public class TagController{
 	}
 	
 	@Route(path = "/tags/(\\d+)", type = PUT)
-	public void editTag(Matcher matcher, TagDto tagDto){
-		Tag tag = Tag.getTag(Integer.parseInt(matcher.group(1)));
+	public void editTag(TagDto tagDto, @Key Tag tag){
 		tag.setName(tagDto.getName());
 		tag.setColor(tagDto.getColor());
 	}
 	
 	@Route(path = "/tags/(\\d+)", type = DELETE)
-	public void deleteTag(Matcher matcher){
-		Tag tag = Tag.getTag(Integer.parseInt(matcher.group(1)));
+	public void deleteTag(@Key Tag tag){
 		TreasureCache.delete(tag);
 	}
 }

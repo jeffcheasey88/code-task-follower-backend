@@ -24,10 +24,13 @@ public class Main{
 		
 		router.setDefaultResponse((matcher, context, reader, writer) -> context.response(context.getType().equals(OPTIONS) ? 200 : 404));
 		
+		DependencyInjector injector = new DependencyInjector()
+				.ofServices();
+		
 		Mapper mapper = new Mapper();
 		router.setMapper(mapper);
 		router.setInternalErrorResponse(mapper);
-		router.bind(new ModelBinder());
+		router.bind(new ModelBinder(injector));
 		
 		new Thread(new Runnable(){
 			public void run(){
@@ -42,8 +45,6 @@ public class Main{
 		
 		new Thread(() ->  router.getExceptionLogger().listen((throwable) ->  throwable.printStackTrace(), (e) -> e.printStackTrace())).start();
 		
-		
-		DependencyInjector injector = new DependencyInjector();
 		router.registerPackages("be.jeffcheasey88.codetaskfollower.controller", injector);
 		router.listen(8001, false);
 	}
