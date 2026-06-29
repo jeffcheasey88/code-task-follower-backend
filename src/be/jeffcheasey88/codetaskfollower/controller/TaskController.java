@@ -15,7 +15,7 @@ import be.jeffcheasey88.codetaskfollower.model.dto.TaskDto;
 import dev.peerat.framework.routes.Route;
 
 public class TaskController {
-    /*@Route(path = "/tasks", type = GET)
+    @Route(path = "/tasks", type = GET)
 	public List<Task> getTasks() {
 		return TaskRepository.getAll();
 	}
@@ -36,14 +36,14 @@ public class TaskController {
 		TaskRepository.edit(taskDto);
 	}
 	
-//	@Route(path = "/tasks/(\\d+)", type = PATCH)
-//	public void editPartialTask(Matcher matcher, TaskDto taskDto) {
-//		Task task = TaskRepository.get(Integer.parseInt(matcher.group(1)));
-//		if(taskDto.getName() != null) task.setName(taskDto.getName());
-//	}
+	@Route(path = "/tasks/(\\d+)", type = PATCH)
+	public void editPartialTask(Matcher matcher, TaskDto taskDto) {
+		Task task = TaskRepository.get(Integer.parseInt(matcher.group(1)));
+		if(taskDto.getName() != null) task.setName(taskDto.getName());
+	}
 	
 	@Route(path = "/tasks/(\\d+)", type = DELETE)
 	public void deleteTask(Matcher matcher) {
 		TaskRepository.delete(Integer.parseInt(matcher.group(1)));
-	}*/
+	}
 }
