@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import be.jeffcheasey88.codetaskfollower.exceptions.NotFoundException;
+import be.jeffcheasey88.codetaskfollower.exception.HttpError;
 import be.jeffcheasey88.codetaskfollower.repository.Repository;
 import dev.peerat.framework.Context;
 import dev.peerat.framework.HttpReader;
@@ -32,7 +32,7 @@ public class ModelBinder implements ExecutableProvider{
 	@Override
 	public void provide(Matcher matcher, Context context, HttpReader reader, HttpWriter writer, Method method, Parameter[] parameters) throws Exception{
 		for(Parameter parameter : parameters){
-			if(parameter.getType().getPackage().getName().contains("codetaskfollower.model.dto")){
+			if(parameter.getType().getPackage().getName().contains("codetaskfollower.dto")){
 				JsonMap json = reader.readJson();
 				Constructor<?> constructor = null;
 				for(Constructor<?> declardConstructor : parameter.getType().getDeclaredConstructors()){
@@ -51,7 +51,7 @@ public class ModelBinder implements ExecutableProvider{
 				Repository<Object,Object> repository = (Repository<Object, Object>) this.dependencies.find(null, Class.forName("be.jeffcheasey88.codetaskfollower.repository."+parameter.getType()+"Repository"), null);
 				Key key = parameter.getAnnotation(Key.class);
 				Object model = repository.findById(repository.parseKey(matcher.group(key.value())));
-				if(model == null) throw new NotFoundException();
+				if(model == null) throw new HttpError(404);
 				parameter.setValue(model);
 			}
 		}

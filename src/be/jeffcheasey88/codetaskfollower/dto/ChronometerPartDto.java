@@ -1,11 +1,11 @@
-package be.jeffcheasey88.codetaskfollower.model.dto;
+package be.jeffcheasey88.codetaskfollower.dto;
 
-public class ChronomterPartDto{
+public class ChronometerPartDto{
 	private int id;
 	private int seconds;
 	private String description;
 	private ChronometerDto chronometer;
-	public ChronomterPartDto(int id, int seconds, String description, ChronometerDto chronometer){
+	public ChronometerPartDto(int id, int seconds, String description, ChronometerDto chronometer){
 		this.id = id;
 		this.seconds = seconds;
 		this.description = description;

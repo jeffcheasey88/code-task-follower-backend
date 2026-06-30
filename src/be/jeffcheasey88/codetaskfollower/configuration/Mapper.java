@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.regex.Matcher;
 
-import be.jeffcheasey88.codetaskfollower.exceptions.ClientErrorException;
+import be.jeffcheasey88.codetaskfollower.exception.HttpError;
 import dev.peerat.framework.Context;
 import dev.peerat.framework.HttpReader;
 import dev.peerat.framework.HttpWriter;
@@ -66,10 +66,14 @@ public class Mapper implements ResponseMapper, Response, ExceptionResponse{
 	
 	@Override
 	public void execute(HttpWriter writer, Throwable throwable, RequestType type, String path) throws Exception {
-		if (throwable instanceof ClientErrorException clientErrorException) {
-			writer.response(clientErrorException.getHttpResponseStatusCode());
-		} else {			
-			System.err.println("\n\nError processing request: [" + type + "] " + path);
+		if (throwable instanceof HttpError error) {
+			writer.response(error.getHttpResponseStatusCode(), "Content-Type: application/json");
+			
+			if (error.isClientError() && error.getClass().getDeclaredFields().length > 0) {
+				writer.write(error);
+			}
+		} else {
+			System.err.println("\n\n Error processing request: [" + type + "] " + path);
 			throwable.printStackTrace();
 		}
 	}

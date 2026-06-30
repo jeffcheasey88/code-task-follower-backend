@@ -1,12 +1,15 @@
-package be.jeffcheasey88.codetaskfollower.model.dto;
+package be.jeffcheasey88.codetaskfollower.dto;
 
-public class TagDto{
+public class ProjectUpdateDto{
+	
 	private String name;
 	private String color;
-	public TagDto(String name, String color){
+	
+	public ProjectUpdateDto(String name, String color){
 		this.name = name;
 		this.color = color;
 	}
+	
 	public void setName(String name){
 		this.name = name;
 	}
@@ -19,4 +22,5 @@ public class TagDto{
 	public String getColor(){
 		return this.color;
 	}
+
 }

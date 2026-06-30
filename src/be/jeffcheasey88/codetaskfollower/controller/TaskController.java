@@ -7,43 +7,50 @@ import static dev.peerat.framework.RequestType.POST;
 import static dev.peerat.framework.RequestType.PUT;
 
 import java.util.List;
-import java.util.regex.Matcher;
 
+import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Key;
+import be.jeffcheasey88.codetaskfollower.mapper.TaskMapper;
 import be.jeffcheasey88.codetaskfollower.model.Task;
 import be.jeffcheasey88.codetaskfollower.repository.TaskRepository;
-import be.jeffcheasey88.codetaskfollower.model.dto.TaskDto;
+import be.jeffcheasey88.codetaskfollower.dto.LightTaskDto;
+import be.jeffcheasey88.codetaskfollower.dto.TaskDto;
+import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
+import dev.peerat.mapping.TreasureCache;
 
 public class TaskController {
+	@Injection private TaskRepository taskRepository;
+	@Injection private TaskMapper taskMapper;
+	
     @Route(path = "/tasks", type = GET)
-	public List<Task> getTasks() {
-		return TaskRepository.getAll();
+	public List<LightTaskDto> getTasks() {
+    	return taskMapper.toDto(
+			taskRepository.findAll()
+		);
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = GET)
-	public Task getTask(Matcher matcher) {
-		return TaskRepository.get(Integer.parseInt(matcher.group(1)));
+	public TaskDto getTask(@Key Task task) {
+		return taskMapper.toDto(task);
 	}
 
-//	@Route(path = "/tasks", type = POST)
-//	public int createTask(TaskDto taskDto){
-//		return (new Task(0, taskDto.getName(), taskDto.getColor())).getId();
-//	}
+	/*@Route(path = "/tasks", type = POST)
+	public int createTask(TaskDto taskDto) {
+		return (new Task(0, taskDto.getName()).getId();
+	}*/
 	
 	@Route(path = "/tasks/(\\d+)", type = PUT)
-	public void editTask(Matcher matcher, TaskDto taskDto) {
-        taskDto.setId(Integer.parseInt(matcher.group(1)));
-		TaskRepository.edit(taskDto);
+	public void editTask(TaskDto taskDto, @Key Task task) {
+        taskMapper.fullCopyDtoToModel(taskDto, task);
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = PATCH)
-	public void editPartialTask(Matcher matcher, TaskDto taskDto) {
-		Task task = TaskRepository.get(Integer.parseInt(matcher.group(1)));
-		if(taskDto.getName() != null) task.setName(taskDto.getName());
+	public void editPartialTask(TaskDto taskDto, @Key Task task) {		
+		taskMapper.safeCopyDtoToModel(taskDto, task);
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = DELETE)
-	public void deleteTask(Matcher matcher) {
-		TaskRepository.delete(Integer.parseInt(matcher.group(1)));
+	public void deleteTask(@Key Task task) {
+		TreasureCache.delete(task);
 	}
 }
