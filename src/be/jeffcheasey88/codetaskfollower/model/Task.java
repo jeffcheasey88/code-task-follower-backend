@@ -33,6 +33,10 @@ public class Task{
 		this.branches = branches;
 		this.codes = codes;
 	}
+	
+	public void setId(int id){
+		this.id = id;
+	}
 
 	public int getId() {
 		return id;

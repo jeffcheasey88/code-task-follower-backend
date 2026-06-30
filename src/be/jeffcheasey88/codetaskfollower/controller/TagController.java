@@ -14,14 +14,18 @@ import dev.peerat.framework.routes.Route;
 import dev.peerat.mapping.TreasureCache;
 
 public class TagController {
-	@Injection private TagRepository tagRepository;
-	@Injection private TagMapper tagMapper;
+	
+	private TagRepository tagRepository;
+	private TagMapper tagMapper;
+	
+	public TagController(@Injection TagRepository tagRepository, @Injection TagMapper tagMapper){
+		this.tagRepository = tagRepository;
+		this.tagMapper = tagMapper;
+	}
 	
 	@Route(path = "/tags", type = GET)
-	public List<TagDto> getTags() {
-		return tagMapper.toDto(
-			tagRepository.findAll()
-		);
+	public List<TagDto> getTags(){
+		return tagMapper.toDto(tagRepository.findAll());
 	}
 
 	@Route(path = "/tags", type = POST)

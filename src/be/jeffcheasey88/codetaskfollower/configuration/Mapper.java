@@ -20,7 +20,7 @@ public class Mapper implements ResponseMapper, Response, ExceptionResponse{
 	
 	public Mapper(){
 		Json.addConverter(o -> {
-			if(o.getClass().getPackage().getName().contains("codetaskfollower.model")){
+			if(o.getClass().getPackage().getName().contains("codetaskfollower.dto")){
 				try {
 					return toJson(o).toString();
 				} catch (Exception e) {
