@@ -4,7 +4,7 @@ import dev.peerat.mapping.Key;
 import dev.peerat.mapping.Treasure;
 
 @Treasure
-public class Tag {
+public class Tag extends Model {
 	@Key(auto=true) private int id;
 	private String name;
 	private String color;
@@ -24,13 +24,13 @@ public class Tag {
 		return this.name;
 	}
 	public void setName(String name){
-		this.name = name;
+		this.name = check("name", name);
 	}
 	
 	public String getColor(){
 		return this.color;
 	}
 	public void setColor(String color){
-		this.color = color;
-	}	
+		this.color = check("color", color);
+	}
 }

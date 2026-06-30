@@ -5,7 +5,7 @@ import java.util.List;
 import be.jeffcheasey88.codetaskfollower.model.Task;
 import dev.peerat.mapping.TreasureCache;
 
-public class TaskRepository implements Repository<Task, Integer> {
+public class TaskRepository extends IntKeyRepository<Task> {
     @Override
 	public List<Task> findAll(){
 		return TreasureCache.<Task>selectAll().toList();
@@ -15,9 +15,5 @@ public class TaskRepository implements Repository<Task, Integer> {
 	public Task findById(Integer id){
 		return TreasureCache.<Task>selectAll().filter(task -> task.getId() == id).get();
 	}
-    
-    @Override
-	public Integer parseKey(String value){
-		return Integer.parseInt(value);
-	}
+
 }

@@ -7,7 +7,7 @@ import java.util.List;
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Key;
 import be.jeffcheasey88.codetaskfollower.mapper.TagMapper;
 import be.jeffcheasey88.codetaskfollower.model.Tag;
-import be.jeffcheasey88.codetaskfollower.model.dto.TagDto;
+import be.jeffcheasey88.codetaskfollower.dto.TagDto;
 import be.jeffcheasey88.codetaskfollower.repository.TagRepository;
 import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
@@ -31,7 +31,7 @@ public class TagController {
 	
 	@Route(path = "/tags/(\\d+)", type = PUT)
 	public void editTag(TagDto tagDto, @Key Tag tag) {
-		tagMapper.fullCopyDtoToEntity(tagDto, tag);
+		tagMapper.fullCopyDtoToModel(tagDto, tag);
 	}
 	
 	@Route(path = "/tags/(\\d+)", type = DELETE)

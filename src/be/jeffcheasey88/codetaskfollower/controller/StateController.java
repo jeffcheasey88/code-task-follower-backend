@@ -7,7 +7,7 @@ import java.util.List;
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Key;
 import be.jeffcheasey88.codetaskfollower.mapper.StateMapper;
 import be.jeffcheasey88.codetaskfollower.model.State;
-import be.jeffcheasey88.codetaskfollower.model.dto.StateDto;
+import be.jeffcheasey88.codetaskfollower.dto.StateDto;
 import be.jeffcheasey88.codetaskfollower.repository.StateRepository;
 import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
@@ -29,12 +29,12 @@ public class StateController {
 	
 	@Route(path = "/states/(\\d+)", type = PUT)
 	public void editState(StateDto stateDto, @Key State state){
-		stateMapper.fullCopyDtoToEntity(stateDto, state);
+		stateMapper.fullCopyDtoToModel(stateDto, state);
 	}
 	
 	@Route(path = "/states/(\\d+)", type = PATCH)
 	public void editPartialState(StateDto stateDto, @Key State state){
-		stateMapper.safeCopyDtoToEntity(stateDto, state);
+		stateMapper.safeCopyDtoToModel(stateDto, state);
 	}
 	
 	@Route(path = "/states/(\\d+)", type = DELETE)

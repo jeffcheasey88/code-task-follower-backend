@@ -1,4 +1,4 @@
-package be.jeffcheasey88.codetaskfollower.model.dto;
+package be.jeffcheasey88.codetaskfollower.dto;
 
 public class ProjectUpdateDto{
 	

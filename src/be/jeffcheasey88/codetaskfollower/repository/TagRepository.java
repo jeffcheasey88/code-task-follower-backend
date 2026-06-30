@@ -7,7 +7,7 @@ import dev.peerat.framework.dependency.Injection;
 import dev.peerat.mapping.TreasureCache;
 
 @Injection
-public class TagRepository implements Repository<Tag, Integer>{
+public class TagRepository extends IntKeyRepository<Tag>{
 
 	@Override
 	public List<Tag> findAll(){
@@ -17,11 +17,6 @@ public class TagRepository implements Repository<Tag, Integer>{
 	@Override
 	public Tag findById(Integer id){
 		return TreasureCache.<Tag>selectAll().filter(tag -> tag.getId() == id).get();
-	}
-
-	@Override
-	public Integer parseKey(String value){
-		return Integer.parseInt(value);
 	}
 
 }
