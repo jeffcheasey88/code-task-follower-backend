@@ -14,8 +14,14 @@ import dev.peerat.framework.routes.Route;
 import dev.peerat.mapping.TreasureCache;
 
 public class StateController {
-	@Injection private StateRepository stateRepository;
-	@Injection private StateMapper stateMapper;
+	
+	private StateRepository stateRepository;
+	private StateMapper stateMapper;
+	
+	public StateController(@Injection StateRepository stateRepository, @Injection StateMapper stateMapper){
+		this.stateRepository = stateRepository;
+		this.stateMapper = stateMapper;
+	}
 	
 	@Route(path = "/states", type = GET)
 	public List<StateDto> getStates() {

@@ -18,9 +18,15 @@ import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
 import dev.peerat.mapping.TreasureCache;
 
-public class TaskController {
-	@Injection private TaskRepository taskRepository;
-	@Injection private TaskMapper taskMapper;
+public class TaskController{
+	
+	private TaskRepository taskRepository;
+	private TaskMapper taskMapper;
+	
+	public TaskController(@Injection TaskRepository taskRepository, @Injection TaskMapper taskMapper){
+		this.taskRepository = taskRepository;
+		this.taskMapper = taskMapper;
+	}
 	
     @Route(path = "/tasks", type = GET)
 	public List<LightTaskDto> getTasks() {
