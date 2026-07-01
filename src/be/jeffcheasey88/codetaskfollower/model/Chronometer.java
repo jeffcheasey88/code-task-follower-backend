@@ -6,7 +6,7 @@ import dev.peerat.mapping.Key;
 import dev.peerat.mapping.Treasure;
 
 @Treasure
-public class Chronometer{
+public class Chronometer extends Model {
 
 	@Key(auto=true) private int id;
 	private int seconds;

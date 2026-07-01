@@ -5,6 +5,7 @@ import static dev.peerat.framework.RequestType.*;
 import be.jeffcheasey88.codetaskfollower.configuration.DatabaseConfiguration;
 import be.jeffcheasey88.codetaskfollower.configuration.Mapper;
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder;
+import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
 import dev.peerat.framework.Router;
 import dev.peerat.framework.dependency.DependencyInjector;
 import dev.peerat.mapping.Ship;
@@ -15,6 +16,7 @@ public class Main{
 	public static void main(String[] args) throws Exception{
 		Ship ship = new Ship("mysql", new MySQLCompass("database", 3306, "code-task-follower", "root", "root"), new DatabaseConfiguration());
 		ship.setSails();
+		TemporalRepository.INSTANCE.connector(ship); //TODO remove
 		
 		Router router = new Router();
 		

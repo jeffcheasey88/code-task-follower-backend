@@ -8,7 +8,7 @@ import dev.peerat.mapping.Key;
 import dev.peerat.mapping.Treasure;
 
 @Treasure
-public class Project {
+public class Project extends Model {
 
 	@Key(auto=true) private int id;
 	
@@ -44,7 +44,7 @@ public class Project {
 	}
 	
 	public void setName(String name){
-		this.name = name;
+		this.name = check("name", name);
 	}
 	
 	public String getName(){
@@ -52,7 +52,7 @@ public class Project {
 	}
 	
 	public void setColor(String color){
-		this.color = color;
+		this.color = check("color", color);
 	}
 	
 	public String getColor(){

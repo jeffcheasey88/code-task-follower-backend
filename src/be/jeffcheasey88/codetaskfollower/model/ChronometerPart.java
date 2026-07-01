@@ -4,7 +4,7 @@ import dev.peerat.mapping.Key;
 import dev.peerat.mapping.Treasure;
 
 @Treasure
-public class ChronometerPart{
+public class ChronometerPart extends Model {
 
 	@Key(auto=true) private int id;
 	private int seconds;
@@ -16,6 +16,10 @@ public class ChronometerPart{
 		this.seconds = seconds;
 		this.description = description;
 		this.chronometer = chronometer;
+	}
+	
+	public void setDescription(String description){
+		this.description = check("description", description);
 	}
 	
 }

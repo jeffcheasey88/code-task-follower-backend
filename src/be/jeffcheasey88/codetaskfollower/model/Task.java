@@ -2,13 +2,16 @@ package be.jeffcheasey88.codetaskfollower.model;
 
 import java.util.List;
 
+import be.jeffcheasey88.codetaskfollower.validator.MinValidator.Min;
 import dev.peerat.mapping.Key;
 import dev.peerat.mapping.Treasure;
 
 @Treasure
-public class Task{
+public class Task extends Model {
 
 	@Key(auto=true) private int id;
+	
+	@Min
 	private String name;
 	//private State state;
 	//private Chronometer chronometer;
@@ -42,6 +45,6 @@ public class Task{
 		return id;
 	}
 	public void setName(String name) {
-		this.name = name;
+		this.name = check("name", name);
 	}
 }

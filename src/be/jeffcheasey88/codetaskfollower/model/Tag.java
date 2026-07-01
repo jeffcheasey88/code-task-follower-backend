@@ -1,12 +1,17 @@
 package be.jeffcheasey88.codetaskfollower.model;
 
+import be.jeffcheasey88.codetaskfollower.validator.MinValidator.Min;
+import be.jeffcheasey88.codetaskfollower.validator.RegexValidator.Regex;
 import dev.peerat.mapping.Key;
 import dev.peerat.mapping.Treasure;
 
 @Treasure
 public class Tag extends Model {
 	@Key(auto=true) private int id;
+	
+	@Min
 	private String name;
+	@Regex("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
 	private String color;
 	
 	public Tag(int id, String name, String color){

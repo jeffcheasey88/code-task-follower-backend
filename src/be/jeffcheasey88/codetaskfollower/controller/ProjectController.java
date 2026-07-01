@@ -1,20 +1,15 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
-import static dev.peerat.framework.RequestType.DELETE;
 import static dev.peerat.framework.RequestType.GET;
-import static dev.peerat.framework.RequestType.PATCH;
-import static dev.peerat.framework.RequestType.POST;
-import static dev.peerat.framework.RequestType.PUT;
 
 import java.util.List;
-import java.util.regex.Matcher;
 
-import be.jeffcheasey88.codetaskfollower.model.Project;
-import be.jeffcheasey88.codetaskfollower.repository.ProjectRepository;
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Key;
 import be.jeffcheasey88.codetaskfollower.dto.LightProjectDto;
 import be.jeffcheasey88.codetaskfollower.dto.ProjectDto;
 import be.jeffcheasey88.codetaskfollower.mapper.ProjectMapper;
+import be.jeffcheasey88.codetaskfollower.model.Project;
+import be.jeffcheasey88.codetaskfollower.repository.ProjectRepository;
 import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
 

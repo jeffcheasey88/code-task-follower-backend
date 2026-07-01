@@ -1,12 +1,14 @@
 package be.jeffcheasey88.codetaskfollower.model;
 
+import be.jeffcheasey88.codetaskfollower.validator.MinValidator.Min;
 import dev.peerat.mapping.Key;
 import dev.peerat.mapping.Treasure;
 
 @Treasure
-public class Branch{
+public class Branch extends Model{
 
 	@Key(auto=true) private int id;
+	@Min
 	private String repositoryName;
 	private String branchName;
 	
@@ -14,5 +16,13 @@ public class Branch{
 		this.id = id;
 		this.repositoryName = repositoryName;
 		this.branchName = branchName;
+	}
+	
+	public void setRepositoryName(String repositoryName){
+		this.repositoryName = check("repositoryName", repositoryName);
+	}
+	
+	public void setBranchName(String branchName){
+		this.branchName = check("branchName", branchName);
 	}
 }
