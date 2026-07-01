@@ -1,8 +1,10 @@
 package be.jeffcheasey88.codetaskfollower.mapper;
 
 import be.jeffcheasey88.codetaskfollower.model.State;
+import dev.peerat.framework.dependency.Injection;
 import be.jeffcheasey88.codetaskfollower.dto.StateDto;
 
+@Injection
 public class StateMapper extends Mapper<StateDto, StateDto, State> {
 	@Override
 	public StateDto toDto(State model) {
