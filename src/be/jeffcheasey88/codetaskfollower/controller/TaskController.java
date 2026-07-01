@@ -30,7 +30,7 @@ public class TaskController{
 	
     @Route(path = "/tasks", type = GET)
 	public List<LightTaskDto> getTasks() {
-    	return taskMapper.toDto(
+    	return taskMapper.toLightDto(
 			taskRepository.findAll()
 		);
 	}

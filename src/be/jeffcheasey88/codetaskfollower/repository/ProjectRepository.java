@@ -7,18 +7,14 @@ import dev.peerat.framework.dependency.Injection;
 import dev.peerat.mapping.TreasureCache;
 
 @Injection
-public class ProjectRepository {
-	
-	
-	public static List<Project> getAll() {
+public class ProjectRepository extends IntKeyRepository<Project> {
+	@Override
+	public List<Project> findAll(){
 		return TreasureCache.<Project>selectAll().toList();
 	}
 	
-	public static Project get(int id) {
+    @Override
+	public Project findById(Integer id){
 		return TreasureCache.<Project>selectAll().filter(project -> project.getId() == id).get();
-	}
-	
-	public static void delete(int id) {
-		TreasureCache.delete(get(id));
 	}
 }

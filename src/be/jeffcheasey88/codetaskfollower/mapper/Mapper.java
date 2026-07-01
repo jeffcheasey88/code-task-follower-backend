@@ -9,7 +9,11 @@ public abstract class Mapper<D, L, M> {
 	public abstract void fullCopyDtoToModel(D dto, M model);
 	public abstract void safeCopyDtoToModel(D dto, M model);
 	
-	public List<L> toDto(List<M> models) {
+	public List<D> toDto(List<M> models) {
+		return models.stream().map(this::toDto).toList();
+	}
+
+	public List<L> toLightDto(List<M> models) {
 		return models.stream().map(this::toLightDto).toList();
 	}
 }

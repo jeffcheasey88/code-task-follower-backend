@@ -2,6 +2,8 @@ package be.jeffcheasey88.codetaskfollower.model;
 
 import java.util.List;
 
+import be.jeffcheasey88.codetaskfollower.validator.MinValidator.Min;
+import be.jeffcheasey88.codetaskfollower.validator.RegexValidator.Regex;
 import dev.peerat.mapping.Key;
 import dev.peerat.mapping.Treasure;
 
@@ -9,8 +11,13 @@ import dev.peerat.mapping.Treasure;
 public class Project {
 
 	@Key(auto=true) private int id;
+	
+	@Min
 	private String name;
+	
+	@Regex("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
 	private String color;
+	
 	private List<State> states;
 	private List<Task> tasks;
 	private List<Branch> branches;
@@ -52,4 +59,11 @@ public class Project {
 		return this.color;
 	}
 	
+	public List<State> getStates(){
+		return this.states;
+	}
+
+	public List<Task> getTasks() {
+		return this.tasks;
+	}
 }
