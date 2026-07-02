@@ -2,6 +2,7 @@ package be.jeffcheasey88.codetaskfollower.model;
 
 import java.util.List;
 
+import be.jeffcheasey88.codetaskfollower.validator.MaxValidator.Max;
 import be.jeffcheasey88.codetaskfollower.validator.MinValidator.Min;
 import be.jeffcheasey88.codetaskfollower.validator.RegexValidator.Regex;
 import dev.peerat.mapping.Key;
@@ -9,7 +10,6 @@ import dev.peerat.mapping.Treasure;
 
 @Treasure
 public class Project extends Model {
-
 	@Key(auto=true) private int id;
 	
 	@Min
@@ -17,6 +17,9 @@ public class Project extends Model {
 	
 	@Regex("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
 	private String color;
+
+	@Max(16383)
+	private String description;
 	
 	private List<State> states;
 	private List<Task> tasks;
@@ -28,8 +31,9 @@ public class Project extends Model {
 		this.color = color;
 	}
 	
-	public Project(int id, String name, String color, List<State> states, List<Task> tasks, List<Branch> branches){
+	public Project(int id, String name, String color, String description, List<State> states, List<Task> tasks, List<Branch> branches){
 		this(id, name, color);
+		this.description = description;
 		this.states = states;
 		this.tasks = tasks;
 		this.branches = branches;
@@ -57,6 +61,14 @@ public class Project extends Model {
 	
 	public String getColor(){
 		return this.color;
+	}
+	
+	public void setDescription(String description){
+		this.description = check("description", description);
+	}
+	
+	public String getDescription(){
+		return this.description;
 	}
 	
 	public List<State> getStates(){

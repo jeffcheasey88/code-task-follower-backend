@@ -1,7 +1,8 @@
 CREATE TABLE projects(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     name varchar(255),
-    color varchar(255)
+    color varchar(255),
+    description text
 );
 
 CREATE TABLE states(

@@ -5,8 +5,8 @@ import java.util.List;
 public record ProjectDto (
 	int id,
 	String name,
-	// TODO Add String description
 	String color,
+	String description,
 	List<StateDto> states,
 	List<TaskDto> tasks,
 	List<BranchDto> branches

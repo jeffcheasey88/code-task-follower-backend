@@ -23,9 +23,10 @@ public class ProjectMapper extends Mapper<ProjectDto, LightProjectDto, Project> 
 			model.getId(),
 			model.getName(),
 			model.getColor(),
+			model.getDescription(),
 			stateMapper.toDto(model.getStates()),
 			taskMapper.toDto(model.getTasks()),
-			List.of()
+			null
 		);
 	}
 
