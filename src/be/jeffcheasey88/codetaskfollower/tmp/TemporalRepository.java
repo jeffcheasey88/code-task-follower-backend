@@ -142,11 +142,11 @@ public class TemporalRepository{
 		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
 	}
 	
-	//chronomterparts (chronometerId)
+	//chronometerparts (chronometerId)
 	public void updateChronometerPart(int chronometerPartId, int taskchronometerIdId){
 		ensureConnection();
 		try{
-			PreparedStatement p = this.con.prepareStatement("UPDATE chronomterparts SET chronometerId = ? WHERE id = ?");
+			PreparedStatement p = this.con.prepareStatement("UPDATE chronometerparts SET chronometerId = ? WHERE id = ?");
 			p.setInt(1, taskchronometerIdId);
 			p.setInt(2, chronometerPartId);
 			if(p.executeUpdate() >= 0) return;

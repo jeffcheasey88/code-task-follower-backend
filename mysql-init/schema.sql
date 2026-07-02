@@ -51,10 +51,10 @@ CREATE TABLE chronometers(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     seconds INTEGER,
     taskId INTEGER,
-    CONSTRAINT fk_chronomter_task FOREIGN KEY (taskId) REFERENCES tasks(id)
+    CONSTRAINT fk_chronometer_task FOREIGN KEY (taskId) REFERENCES tasks(id)
 );
 
-CREATE TABLE chronomterparts(
+CREATE TABLE chronometerparts(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     seconds INTEGER,
     description varchar(255),
@@ -62,7 +62,7 @@ CREATE TABLE chronomterparts(
     CONSTRAINT fk_chronometerpart_chronometer FOREIGN KEY (chronometerId) REFERENCES chronometers(id)
 );
 
-CREATE TABLE branchs(
+CREATE TABLE branches(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     repositoryName varchar(255),
     branchName varchar(255)
@@ -73,7 +73,7 @@ CREATE TABLE TaskBranch(
     branchId INTEGER,
     PRIMARY KEY (taskId, branchId),
     CONSTRAINT fk_taskbranch_task FOREIGN KEY (taskId) REFERENCES tasks(id),
-    CONSTRAINT fk_taskbranch_branch FOREIGN KEY (branchId) REFERENCES branchs(id)
+    CONSTRAINT fk_taskbranch_branch FOREIGN KEY (branchId) REFERENCES branches(id)
 );
 
 CREATE TABLE ProjectBranch(
@@ -81,7 +81,7 @@ CREATE TABLE ProjectBranch(
     branchId INTEGER,
     PRIMARY KEY (projectId, branchId),
     CONSTRAINT fk_projectbranch_project FOREIGN KEY (projectId) REFERENCES projects(id),
-    CONSTRAINT fk_projectbranch_branch FOREIGN KEY (branchId) REFERENCES branchs(id)
+    CONSTRAINT fk_projectbranch_branch FOREIGN KEY (branchId) REFERENCES branches(id)
 );
 
 CREATE TABLE tags(
@@ -102,7 +102,7 @@ CREATE TABLE codes(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     branch INTEGER,
     classPath varchar(255),
-    CONSTRAINT fk_code_branch FOREIGN KEY (branch) REFERENCES branchs(id)
+    CONSTRAINT fk_code_branch FOREIGN KEY (branch) REFERENCES branches(id)
 );
 
 CREATE TABLE TaskCode(
