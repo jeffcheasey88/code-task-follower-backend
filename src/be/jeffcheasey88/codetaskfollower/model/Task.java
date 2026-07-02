@@ -37,13 +37,31 @@ public class Task extends Model {
 		this.codes = codes;
 	}
 	
-	public void setId(int id){
-		this.id = id;
-	}
-
 	public int getId() {
 		return id;
 	}
+	public String getName() {
+		return name;
+	}
+	public List<Tag> getTags() {
+		return tags;
+	}
+	public List<Task> getDependencies() {
+		return dependencies;
+	}
+	public List<Project> getProjects() {
+		return projects;
+	}
+	public List<Commit> getCommits() {
+		return commits;
+	}
+	public List<Branch> getBranches() {
+		return branches;
+	}
+	public List<Code> getCodes() {
+		return codes;
+	}
+
 	public void setName(String name) {
 		this.name = check("name", name);
 	}
