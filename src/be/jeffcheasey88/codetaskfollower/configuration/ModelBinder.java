@@ -48,9 +48,9 @@ public class ModelBinder implements ExecutableProvider{
 				}
 				parameter.setValue(constructor.newInstance(values.toArray()));
 			}else if(parameter.getType().getPackage().getName().endsWith("codetaskfollower.model")){
-				Repository<Object,Object> repository = (Repository<Object, Object>) this.dependencies.find(null, Class.forName("be.jeffcheasey88.codetaskfollower.repository."+parameter.getType()+"Repository"), null);
-				Key key = parameter.getAnnotation(Key.class);
-				Object model = repository.findById(repository.parseKey(matcher.group(key.value())));
+				Repository<Object,Object> repository = (Repository<Object, Object>) this.dependencies.find(null, Class.forName("be.jeffcheasey88.codetaskfollower.repository." + parameter.getType().getSimpleName() + "Repository"), null);
+				//Key key = parameter.getAnnotation(Key.class); FIXME System.out.println(List.of(parameter.getAnnotations()).stream().map(a -> a.annotationType().getName()).reduce((acc, s) -> acc + s).get());
+				Object model = repository.findById(repository.parseKey(matcher.group(1)));//key.value())));
 				if(model == null) throw new HttpError(404);
 				parameter.setValue(model);
 			}
@@ -59,7 +59,7 @@ public class ModelBinder implements ExecutableProvider{
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.PARAMETER)
-	public static @interface Key{
+	public @interface Key{
 		
 		int value() default 1;
 		

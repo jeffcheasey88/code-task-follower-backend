@@ -10,10 +10,12 @@ public abstract class Mapper<D, L, M> {
 	public abstract void safeCopyDtoToModel(D dto, M model);
 	
 	public List<D> toDto(List<M> models) {
+		if (models == null) return null;
 		return models.stream().map(this::toDto).toList();
 	}
 
 	public List<L> toLightDto(List<M> models) {
+		if (models == null) return null;
 		return models.stream().map(this::toLightDto).toList();
 	}
 }
