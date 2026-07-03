@@ -34,12 +34,12 @@ public class ProjectController {
 	public ProjectDto getProject(@Key Project project) {
 		return projectMapper.toDto(project);
 	}
-
+/*
 	@Route(path = "/projects", type = POST)
 	public int createProject(ProjectDto projectDto){
 		return (new Project(0, projectDto.name(), projectDto.color(), projectDto.description())).getId();
 	}
-/*	
+	
 	// TODO : GET /projects/{id}/tasks/{stateId} 	récupere toutes les tâches d'un certain etat
 	
 	
