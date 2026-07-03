@@ -1,6 +1,7 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
 import static dev.peerat.framework.RequestType.GET;
+import static dev.peerat.framework.RequestType.POST;
 
 import java.util.List;
 
@@ -34,11 +35,11 @@ public class ProjectController {
 		return projectMapper.toDto(project);
 	}
 
-	/*@Route(path = "/projects", type = POST)
+	@Route(path = "/projects", type = POST)
 	public int createProject(ProjectDto projectDto){
-		return (new Project(0, projectDto.getName(), projectDto.getColor())).getId();
+		return (new Project(0, projectDto.name(), projectDto.color(), projectDto.description())).getId();
 	}
-	
+/*	
 	// TODO : GET /projects/{id}/tasks/{stateId} 	récupere toutes les tâches d'un certain etat
 	
 	

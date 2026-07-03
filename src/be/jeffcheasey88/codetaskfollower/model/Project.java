@@ -25,15 +25,15 @@ public class Project extends Model {
 	private List<Task> tasks;
 	private List<Branch> branches;
 	
-	public Project(int id, String name, String color) {
+	public Project(int id, String name, String color, String description) {
 		this.id = id;
 		this.name = name;
 		this.color = color;
+		this.description = description;
 	}
 	
 	public Project(int id, String name, String color, String description, List<State> states, List<Task> tasks, List<Branch> branches){
-		this(id, name, color);
-		this.description = description;
+		this(id, name, color, description);
 		this.states = states;
 		this.tasks = tasks;
 		this.branches = branches;
