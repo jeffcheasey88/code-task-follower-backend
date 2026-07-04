@@ -28,13 +28,14 @@ public class TaskController{
 	@Injection private TagMapper tagMapper;
 	
     @Route(path = "/tasks")
-	public List<LightTaskDto> getTasks() {
-    	return taskMapper.toLightDto(taskRepository.findAll());
+	public List<LightTaskDto> getTasks(){
+    	return taskMapper.toLightDto(taskRepository.findAll()).stream().map(taskDto -> new LightTaskDto(taskDto.id(), taskDto.name(), getTags(taskDto.id()), null)).toList();
 	}
 	
 	@Route(path = "/tasks/(\\d+)")
 	public TaskDto getTask(@Argument Task task) {
-		return taskMapper.toDto(task);
+		TaskDto taskDto = taskMapper.toDto(task);
+		return new TaskDto(taskDto.id(), taskDto.name(), getTags(taskDto.id()), null, null, null, null, null);
 	}
 
 	@Route(path = "/tasks", type = POST)
@@ -69,7 +70,11 @@ public class TaskController{
 	
 	@Route(path = "/tasks/(\\d+)/tags")
 	public List<TagDto> getTags(Matcher matcher){
-		return tagMapper.toDto(TemporalRepository.INSTANCE.selectTags(Integer.parseInt(matcher.group(1))));
+		return getTags(Integer.parseInt(matcher.group(1)));
+	}
+	
+	public List<TagDto> getTags(int taskId){
+		return tagMapper.toDto(TemporalRepository.INSTANCE.selectTags(taskId));
 	}
 	
 	@Route(path = "/tasks/(\\d+)/state/(\\d+)", type = PUT)
