@@ -31,7 +31,7 @@ public class TaskController{
 
 	@Route(path = "/tasks", type = POST)
 	public int createTask(TaskDto taskDto) {
-		return (new Task(0, taskDto.name(), null, null, null, null, null, null)).getId();
+		return new Task(0, taskDto.name(), null, null, null, null, null, null).getId();
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = PUT)

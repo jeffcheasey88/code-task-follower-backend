@@ -28,8 +28,8 @@ public class StateController {
 	}
 
 	@Route(path = "/states", type = POST)
-	public void createState(StateDto stateDto) {
-		new State(0, stateDto.getName(), stateDto.getColor());
+	public int createState(StateDto stateDto) {
+		return new State(0, stateDto.getName(), stateDto.getColor()).getId();
 	}
 	
 	@Route(path = "/states/(\\d+)", type = PUT)

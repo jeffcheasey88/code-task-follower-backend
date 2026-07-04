@@ -27,8 +27,8 @@ public class TagController {
 	}
 
 	@Route(path = "/tags", type = POST)
-	public void createTag(TagDto tagDto) {
-		new Tag(0, tagDto.getName(), tagDto.getColor());
+	public int createTag(TagDto tagDto) {
+		return new Tag(0, tagDto.getName(), tagDto.getColor()).getId();
 	}
 	
 	@Route(path = "/tags/(\\d+)", type = PUT)
