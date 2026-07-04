@@ -22,7 +22,7 @@ public class StateController {
 	@Injection private StateRepository stateRepository;
 	@Injection private StateMapper stateMapper;
 	
-	@Route(path = "/states", type = GET)
+	@Route(path = "/states")
 	public List<StateDto> getStates() {
 		return stateMapper.toDto(stateRepository.findAll());
 	}

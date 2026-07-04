@@ -37,6 +37,10 @@ public class Task extends Model {
 		this.codes = codes;
 	}
 	
+	public void setId(int id){
+		this.id = id;
+	}
+	
 	public int getId() {
 		return id;
 	}

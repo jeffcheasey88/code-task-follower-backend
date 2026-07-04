@@ -19,12 +19,12 @@ public class TaskController{
 	@Injection private TaskRepository taskRepository;
 	@Injection private TaskMapper taskMapper;
 	
-    @Route(path = "/tasks", type = GET)
+    @Route(path = "/tasks")
 	public List<LightTaskDto> getTasks() {
     	return taskMapper.toLightDto(taskRepository.findAll());
 	}
 	
-	@Route(path = "/tasks/(\\d+)", type = GET)
+	@Route(path = "/tasks/(\\d+)")
 	public TaskDto getTask(@Argument Task task) {
 		return taskMapper.toDto(task);
 	}

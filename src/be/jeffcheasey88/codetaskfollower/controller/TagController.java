@@ -21,7 +21,7 @@ public class TagController {
 	@Injection private TagRepository tagRepository;
 	@Injection private TagMapper tagMapper;
 	
-	@Route(path = "/tags", type = GET)
+	@Route(path = "/tags")
 	public List<TagDto> getTags(){
 		return tagMapper.toDto(tagRepository.findAll());
 	}
