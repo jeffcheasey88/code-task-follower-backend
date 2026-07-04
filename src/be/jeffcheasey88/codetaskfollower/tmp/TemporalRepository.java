@@ -11,6 +11,7 @@ import dev.peerat.mapping.CursedTreasureException;
 import dev.peerat.mapping.Ship;
 import dev.peerat.mapping.ShipwreckException;
 import dev.peerat.mapping.providers.mysql.MySQLCompass;
+import be.jeffcheasey88.codetaskfollower.model.State;
 import be.jeffcheasey88.codetaskfollower.model.Tag;
 
 public class TemporalRepository{
@@ -298,6 +299,21 @@ public class TemporalRepository{
 			ResultSet r = p.executeQuery();
 			List<Tag> l = new ArrayList<>();
 			while(r.next()) l.add(new Tag(r.getInt("t.id"), r.getString("t.name"), r.getString("t.color")));
+			return l;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to get the treasure from the treasure's cache", e);
+		}
+
+	}
+	
+	public List<State> selectStates(int projectId){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement("SELECT s.* FROM states s JOIN ProjectStates ps ON ps.stateId = s.id JOIN projects p ON p.id = ps.projectId WHERE p.id = ?");
+			p.setInt(1, projectId);
+			ResultSet r = p.executeQuery();
+			List<State> l = new ArrayList<>();
+			while(r.next()) l.add(new State(r.getInt("s.id"), r.getString("s.name"), r.getString("s.color")));
 			return l;
 		}catch(Exception e){
 			throw new CursedTreasureException("Failed to get the treasure from the treasure's cache", e);

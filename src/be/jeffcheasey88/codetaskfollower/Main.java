@@ -37,7 +37,7 @@ public class Main{
 		new Thread(new Runnable(){
 			public void run(){
 				router.getLogger().listen((context) -> {
-					System.out.println("["+(("?" +context.getType()+" "+context.getPath()+" -> "+context.getResponseCode())));
+					System.out.println("["+context.getType()+"] "+context.getPath()+" -> "+context.getResponseCode());
 				},
 				(e) -> e.printStackTrace()
 				);
