@@ -1,5 +1,14 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
+import static dev.peerat.framework.RequestType.*;
+
+import be.jeffcheasey88.codetaskfollower.model.ChronometerPart;
+import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Argument;
+import be.jeffcheasey88.codetaskfollower.dto.ChronometerDto;
+import be.jeffcheasey88.codetaskfollower.dto.ChronometerPartDto;
+import be.jeffcheasey88.codetaskfollower.model.Task;
+import dev.peerat.framework.routes.Route;
+
 public class ChronometerController{
 	
 	//POST chronometer/{taskId}								nouveau chornometer
@@ -9,4 +18,33 @@ public class ChronometerController{
 	//DELETE chronometer/{taskId}/part/{partId)				supprime une part
 	//POST chronometer/{taskId/part/{partId}/takeTiming 	prend le temps d'une part
 
+	@Route(path = "chronometer/(\\d+)", type = POST)
+	public int createChornometer(@Argument Task task){
+		return 0;
+	}
+	
+	@Route(path = "chronometer/(\\d+)")
+	public ChronometerDto getChronometer(@Argument Task task){
+		return null;
+	}
+	
+	@Route(path = "chronometer/(\\d+)/part", type = POST)
+	public int createChronometerPart(@Argument Task task){
+		return 0;
+	}
+	
+	@Route(path = "chronometer/(\\d+)/part/(\\d+)", type = PUT)
+	public ChronometerPartDto editPart(@Argument Task task, @Argument(2) ChronometerPart chronometerPart){
+		return null;
+	}
+	
+	@Route(path = "chronometer/(\\d+)/part/(\\d+)", type = DELETE)
+	public void deletePart(@Argument Task task, @Argument(2) ChronometerPart chronometerPart){
+		
+	}
+	
+	@Route(path = "chronometer/(\\d+)/part/(\\d+)/takeTiming", type = POST)
+	public ChronometerPartDto takeTiming(@Argument Task task, @Argument(2) ChronometerPart chronometerPart){
+		return null;
+	}
 }

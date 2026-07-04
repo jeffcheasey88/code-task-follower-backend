@@ -6,13 +6,10 @@ import be.jeffcheasey88.codetaskfollower.dto.LightTaskDto;
 import be.jeffcheasey88.codetaskfollower.dto.TaskDto;
 
 @Injection
-public class TaskMapper extends Mapper<TaskDto, LightTaskDto, Task> {
-	private TagMapper tagMapper;
-
-	public TaskMapper(@Injection TagMapper stateMapper) {
-		this.tagMapper = stateMapper;
-	}
+public class TaskMapper extends Mapper<TaskDto, LightTaskDto, Task>{
 	
+	@Injection private TagMapper tagMapper;
+
 	@Override
 	public TaskDto toDto(Task model) {
 		return new TaskDto(

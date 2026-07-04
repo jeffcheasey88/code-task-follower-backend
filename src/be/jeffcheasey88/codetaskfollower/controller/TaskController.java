@@ -1,9 +1,6 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
-import static dev.peerat.framework.RequestType.DELETE;
-import static dev.peerat.framework.RequestType.GET;
-import static dev.peerat.framework.RequestType.PATCH;
-import static dev.peerat.framework.RequestType.PUT;
+import static dev.peerat.framework.RequestType.*;
 
 import java.util.List;
 
@@ -19,19 +16,12 @@ import dev.peerat.mapping.TreasureCache;
 
 public class TaskController{
 	
-	private TaskRepository taskRepository;
-	private TaskMapper taskMapper;
-	
-	public TaskController(@Injection TaskRepository taskRepository, @Injection TaskMapper taskMapper){
-		this.taskRepository = taskRepository;
-		this.taskMapper = taskMapper;
-	}
+	@Injection private TaskRepository taskRepository;
+	@Injection private TaskMapper taskMapper;
 	
     @Route(path = "/tasks", type = GET)
 	public List<LightTaskDto> getTasks() {
-    	return taskMapper.toLightDto(
-			taskRepository.findAll()
-		);
+    	return taskMapper.toLightDto(taskRepository.findAll());
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = GET)
@@ -39,10 +29,10 @@ public class TaskController{
 		return taskMapper.toDto(task);
 	}
 
-	/*@Route(path = "/tasks", type = POST)
+	@Route(path = "/tasks", type = POST)
 	public int createTask(TaskDto taskDto) {
-		return (new Task(0, taskDto.getName()).getId();
-	}*/
+		return (new Task(0, taskDto.name(), null, null, null, null, null, null)).getId();
+	}
 	
 	@Route(path = "/tasks/(\\d+)", type = PUT)
 	public void editTask(TaskDto taskDto, @Argument Task task) {

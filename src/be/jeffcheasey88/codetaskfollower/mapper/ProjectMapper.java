@@ -7,14 +7,9 @@ import dev.peerat.framework.dependency.Injection;
 
 @Injection
 public class ProjectMapper extends Mapper<ProjectDto, LightProjectDto, Project> {
-	private StateMapper stateMapper;
-	private TaskMapper taskMapper;
+	@Injection private StateMapper stateMapper;
+	@Injection private TaskMapper taskMapper;
 
-	public ProjectMapper(@Injection StateMapper stateMapper, @Injection TaskMapper taskMapper) {
-		this.stateMapper = stateMapper;
-		this.taskMapper = taskMapper;
-	}
-	
 	@Override
 	public ProjectDto toDto(Project model) {
 		return new ProjectDto(

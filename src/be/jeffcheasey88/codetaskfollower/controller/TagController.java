@@ -18,13 +18,8 @@ import dev.peerat.mapping.TreasureCache;
 
 public class TagController {
 	
-	private TagRepository tagRepository;
-	private TagMapper tagMapper;
-	
-	public TagController(@Injection TagRepository tagRepository, @Injection TagMapper tagMapper){
-		this.tagRepository = tagRepository;
-		this.tagMapper = tagMapper;
-	}
+	@Injection private TagRepository tagRepository;
+	@Injection private TagMapper tagMapper;
 	
 	@Route(path = "/tags", type = GET)
 	public List<TagDto> getTags(){
