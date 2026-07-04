@@ -40,4 +40,5 @@ public class TagController {
 	public void deleteTag(@Argument Tag tag) {
 		TreasureCache.delete(tag);
 	}
+	
 }
