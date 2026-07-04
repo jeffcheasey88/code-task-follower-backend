@@ -1,6 +1,9 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
-import static dev.peerat.framework.RequestType.*;
+import static dev.peerat.framework.RequestType.DELETE;
+import static dev.peerat.framework.RequestType.PATCH;
+import static dev.peerat.framework.RequestType.POST;
+import static dev.peerat.framework.RequestType.PUT;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -15,11 +18,14 @@ import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
 import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
 import dev.peerat.mapping.TreasureCache;
+import be.jeffcheasey88.codetaskfollower.dto.TagDto;
+import be.jeffcheasey88.codetaskfollower.mapper.TagMapper;
 
 public class TaskController{
 	
 	@Injection private TaskRepository taskRepository;
 	@Injection private TaskMapper taskMapper;
+	@Injection private TagMapper tagMapper;
 	
     @Route(path = "/tasks")
 	public List<LightTaskDto> getTasks() {
@@ -60,4 +66,15 @@ public class TaskController{
 	public void removeTaskTag(Matcher matcher) {
         TemporalRepository.INSTANCE.removeTaskTag(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
 	}
+	
+	@Route(path = "/tasks/(\\d+)/tags")
+	public List<TagDto> getTags(Matcher matcher){
+		return tagMapper.toDto(TemporalRepository.INSTANCE.selectTags(Integer.parseInt(matcher.group(1))));
+	}
+	
+	@Route(path = "/tasks/(\\d+)/state/(\\d+)", type = PUT)
+	public void updateTaskState(Matcher matcher){
+        TemporalRepository.INSTANCE.updateTaskState(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
+	}
+	
 }

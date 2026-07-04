@@ -3,11 +3,15 @@ package be.jeffcheasey88.codetaskfollower.tmp;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import dev.peerat.mapping.CursedTreasureException;
 import dev.peerat.mapping.Ship;
 import dev.peerat.mapping.ShipwreckException;
 import dev.peerat.mapping.providers.mysql.MySQLCompass;
+import be.jeffcheasey88.codetaskfollower.model.Tag;
 
 public class TemporalRepository{
 	
@@ -284,6 +288,21 @@ public class TemporalRepository{
 		}
 
 		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	}
+	
+	public List<Tag> selectTags(int taskId){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement("SELECT t.* FROM tags t JOIN TaskTag tt ON tt.tagId = t.id JOIN tasks task ON task.id = tt.taskId WHERE task.id = ?");
+			p.setInt(1, taskId);
+			ResultSet r = p.executeQuery();
+			List<Tag> l = new ArrayList<>();
+			while(r.next()) l.add(new Tag(r.getInt("t.id"), r.getString("t.name"), r.getString("t.color")));
+			return l;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to get the treasure from the treasure's cache", e);
+		}
+
 	}
 
 }
