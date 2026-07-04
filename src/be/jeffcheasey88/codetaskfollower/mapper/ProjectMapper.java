@@ -1,7 +1,5 @@
 package be.jeffcheasey88.codetaskfollower.mapper;
 
-import java.util.List;
-
 import be.jeffcheasey88.codetaskfollower.dto.LightProjectDto;
 import be.jeffcheasey88.codetaskfollower.dto.ProjectDto;
 import be.jeffcheasey88.codetaskfollower.model.Project;
@@ -23,16 +21,13 @@ public class ProjectMapper extends Mapper<ProjectDto, LightProjectDto, Project> 
 			model.getId(),
 			model.getName(),
 			model.getColor(),
-			model.getDescription(),
-			stateMapper.toDto(model.getStates()),
-			taskMapper.toDto(model.getTasks()),
-			null
+			model.getDescription()
 		);
 	}
 
 	@Override
 	public LightProjectDto toLightDto(Project model) {
-		return new LightProjectDto(model.getId(), model.getName(), model.getColor());
+		return new LightProjectDto(model.getId(), model.getName(), model.getColor(), model.getDescription());
 	}
 
 	@Override

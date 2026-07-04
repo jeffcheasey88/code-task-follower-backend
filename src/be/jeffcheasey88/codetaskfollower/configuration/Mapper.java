@@ -34,11 +34,17 @@ public class Mapper implements ResponseMapper, Response, ExceptionResponse{
 	@Override
 	public void map(Matcher matcher, Context context, HttpReader reader, HttpWriter writer, Object result) throws Exception{
 		if(result != null){
+			if(result instanceof Number){
+				context.response(200);
+				writer.write(""+(Number)result);
+				writer.flush();
+				return;
+			}
 			String value = toJson(result).toString();
 			context.response(200, "Content-Type: application/json", "Content-Length: "+value.length());
 			writer.write(value);
 			writer.flush();
-			writer.safeWait(10000);
+			//writer.safeWait(10000);
 		}else{
 			if(context.getResponseCode() == 0) context.response(200);
 		}

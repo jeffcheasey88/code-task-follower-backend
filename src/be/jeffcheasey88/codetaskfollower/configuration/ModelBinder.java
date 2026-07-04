@@ -1,5 +1,6 @@
 package be.jeffcheasey88.codetaskfollower.configuration;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -8,6 +9,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -32,6 +34,7 @@ public class ModelBinder implements ExecutableProvider{
 	@Override
 	public void provide(Matcher matcher, Context context, HttpReader reader, HttpWriter writer, Method method, Parameter[] parameters) throws Exception{
 		for(Parameter parameter : parameters){
+			System.out.println("parameter "+parameter.getType()+" "+parameter.getName()+" -> "+Arrays.toString(parameter.getAnnotations())+" -> "+Arrays.toString(parameter.getDeclaredAnnotations()));
 			if(parameter.getType().getPackage().getName().contains("codetaskfollower.dto")){
 				JsonMap json = reader.readJson();
 				Constructor<?> constructor = null;
@@ -49,8 +52,11 @@ public class ModelBinder implements ExecutableProvider{
 				parameter.setValue(constructor.newInstance(values.toArray()));
 			}else if(parameter.getType().getPackage().getName().endsWith("codetaskfollower.model")){
 				Repository<Object,Object> repository = (Repository<Object, Object>) this.dependencies.find(null, Class.forName("be.jeffcheasey88.codetaskfollower.repository." + parameter.getType().getSimpleName() + "Repository"), null);
-				//Key key = parameter.getAnnotation(Key.class); FIXME System.out.println(List.of(parameter.getAnnotations()).stream().map(a -> a.annotationType().getName()).reduce((acc, s) -> acc + s).get());
-				Object model = repository.findById(repository.parseKey(matcher.group(1)));//key.value())));
+				for(Annotation annotation : parameter.getAnnotations()){
+					System.out.println(" -> "+annotation);
+				}
+				//Argument key = parameter.getAnnotation(Argument.class); //FIXME System.out.println(List.of(parameter.getAnnotations()).stream().map(a -> a.annotationType().getName()).reduce((acc, s) -> acc + s).get());
+				Object model = repository.findById(repository.parseKey(matcher.group(1))); //key.value())));
 				if(model == null) throw new HttpError(404);
 				parameter.setValue(model);
 			}
@@ -59,7 +65,7 @@ public class ModelBinder implements ExecutableProvider{
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.PARAMETER)
-	public @interface Key{
+	public @interface Argument{
 		
 		int value() default 1;
 		
