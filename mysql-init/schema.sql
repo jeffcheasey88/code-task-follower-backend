@@ -1,13 +1,13 @@
 CREATE TABLE projects(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    name varchar(255),
+    name varchar(255) NOT NULL,
     color varchar(255),
     description text
 );
 
 CREATE TABLE states(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    name varchar(255),
+    name varchar(255) NOT NULL,
     color varchar(255)
 );
 
@@ -21,8 +21,9 @@ CREATE TABLE ProjectStates(
 
 CREATE TABLE tasks(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    name varchar(255),
-    stateId INTEGER,
+    name varchar(255) NOT NULL,
+    stateId INTEGER NOT NULL,
+    estimateSeconds INTEGER,
     CONSTRAINT fk_task_state FOREIGN KEY (stateId) REFERENCES states(id)
 );
 
@@ -36,7 +37,7 @@ CREATE TABLE TaskProject(
 
 CREATE TABLE commits(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    hash varchar(255)
+    hash varchar(255) NOT NULL
 );
 
 CREATE TABLE CommitTask(
@@ -64,7 +65,7 @@ CREATE TABLE chronometerparts(
 
 CREATE TABLE branches(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    repositoryName varchar(255),
+    repositoryName varchar(255) NOT NULL,
     branchName varchar(255)
 );
 
@@ -86,7 +87,7 @@ CREATE TABLE ProjectBranch(
 
 CREATE TABLE tags(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    name varchar(255),
+    name varchar(255) NOT NULL,
     color varchar(255)
 );
 
@@ -111,4 +112,18 @@ CREATE TABLE TaskCode(
     PRIMARY KEY (taskId, codeId),
     CONSTRAINT fk_taskcode_task FOREIGN KEY (taskId) REFERENCES tasks(id),
     CONSTRAINT fk_taskcode_code FOREIGN KEY (codeId) REFERENCES codes(id)
+);
+
+CREATE TABLE features(
+	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+	name varchar(255) NOT NULL,
+	description varchar(255),
+	version INTEGER
+);
+
+CREATE TABLE players(
+	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+	username varchar(255) NOT NULL,
+	password varchar(255) NOT NULL,
+	isAdmin boolean
 );

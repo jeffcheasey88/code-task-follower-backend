@@ -34,7 +34,6 @@ public class ModelBinder implements ExecutableProvider{
 	@Override
 	public void provide(Matcher matcher, Context context, HttpReader reader, HttpWriter writer, Method method, Parameter[] parameters) throws Exception{
 		for(Parameter parameter : parameters){
-			System.out.println("parameter "+parameter.getType()+" "+parameter.getName()+" -> "+Arrays.toString(parameter.getAnnotations())+" -> "+Arrays.toString(parameter.getDeclaredAnnotations()));
 			if(parameter.getType().getPackage().getName().contains("codetaskfollower.dto")){
 				JsonMap json = reader.readJson();
 				Constructor<?> constructor = null;

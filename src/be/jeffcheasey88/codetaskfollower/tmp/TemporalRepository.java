@@ -298,7 +298,7 @@ public class TemporalRepository{
 			p.setInt(1, taskId);
 			ResultSet r = p.executeQuery();
 			List<Tag> l = new ArrayList<>();
-			while(r.next()) l.add(new Tag(r.getInt("t.id"), r.getString("t.name"), r.getString("t.color")));
+			while(r.next()) l.add(trickTag(r.getInt("t.id"), r.getString("t.name"), r.getString("t.color")));
 			return l;
 		}catch(Exception e){
 			throw new CursedTreasureException("Failed to get the treasure from the treasure's cache", e);
@@ -313,12 +313,26 @@ public class TemporalRepository{
 			p.setInt(1, projectId);
 			ResultSet r = p.executeQuery();
 			List<State> l = new ArrayList<>();
-			while(r.next()) l.add(new State(r.getInt("s.id"), r.getString("s.name"), r.getString("s.color")));
+			while(r.next()) l.add(trickState(r.getInt("s.id"), r.getString("s.name"), r.getString("s.color")));
 			return l;
 		}catch(Exception e){
 			throw new CursedTreasureException("Failed to get the treasure from the treasure's cache", e);
 		}
-
 	}
-
+	
+	private Tag trickTag(int id, String name, String color){
+		interface NewTag{
+			Tag create(int id, String name, String color);
+		}
+		NewTag creator = Tag::new;
+		return creator.create(id, name, color);
+	}
+	
+	private State trickState(int id, String name, String color){
+		interface NewTag{
+			State create(int id, String name, String color);
+		}
+		NewTag creator = State::new;
+		return creator.create(id, name, color);
+	}
 }
