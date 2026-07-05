@@ -320,19 +320,20 @@ public class TemporalRepository{
 		}
 	}
 	
+	interface NewTag{
+		Tag create(int id, String name, String color);
+	}
+	
 	private Tag trickTag(int id, String name, String color){
-		interface NewTag{
-			Tag create(int id, String name, String color);
-		}
 		NewTag creator = Tag::new;
 		return creator.create(id, name, color);
 	}
 	
+	interface NewState{
+		State create(int id, String name, String color);
+	}
 	private State trickState(int id, String name, String color){
-		interface NewTag{
-			State create(int id, String name, String color);
-		}
-		NewTag creator = State::new;
+		NewState creator = State::new;
 		return creator.create(id, name, color);
 	}
 }

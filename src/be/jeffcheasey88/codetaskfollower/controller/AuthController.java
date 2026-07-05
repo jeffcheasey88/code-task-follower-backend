@@ -2,12 +2,16 @@ package be.jeffcheasey88.codetaskfollower.controller;
 
 import static dev.peerat.framework.RequestType.POST;
 
+import com.password4j.Password;
+
 import be.jeffcheasey88.codetaskfollower.configuration.Authenticator.User;
 import be.jeffcheasey88.codetaskfollower.dto.AuthDto;
+import be.jeffcheasey88.codetaskfollower.model.Player;
 import dev.peerat.framework.Context;
 import dev.peerat.framework.Router;
 import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
+import dev.peerat.mapping.TreasureCache;
 
 public class AuthController{
 	
@@ -15,15 +19,34 @@ public class AuthController{
 	
 	@Route(path = "/users/register", type = POST)
 	public void register(Context context, AuthDto authDto) throws Exception{
+		Player player = getPlayer(authDto.username());
+		if(player != null){
+			context.response(400);
+			return;
+		}
+		player = new Player(0, authDto.username(), Password.hash(authDto.password()).withArgon2().getResult(), false);
 		context.response(200,
 				"Access-Control-Expose-Headers: Authorization",
-				"Authorization: Bearer " + this.router.createAuthUser(new User(0, authDto.username())));
+				"Authorization: Bearer " + this.router.createAuthUser(new User(player.getId(), authDto.username())));
+	}
+	
+	private Player getPlayer(String username){
+		return TreasureCache.<Player>selectAll().filter(player -> player.getUsername() == username).get();
 	}
 	
 	@Route(path = "/users/login", type = POST)
 	public void login(Context context, AuthDto authDto) throws Exception{
-		context.response(200,
-				"Access-Control-Expose-Headers: Authorization",
-				"Authorization: Bearer " + this.router.createAuthUser(new User(0, authDto.username())));
+		Player player = getPlayer(authDto.username());
+		if(player == null){
+			context.response(400);
+			return;
+		}
+		if(Password.check(authDto.password(), player.getPassword()).withArgon2()){
+			context.response(200,
+					"Access-Control-Expose-Headers: Authorization",
+					"Authorization: Bearer " + this.router.createAuthUser(new User(player.getId(), authDto.username())));
+		}else{
+			context.response(400);
+		}
 	}
 }
