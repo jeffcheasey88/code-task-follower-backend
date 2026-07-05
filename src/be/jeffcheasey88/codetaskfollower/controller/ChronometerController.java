@@ -18,32 +18,32 @@ public class ChronometerController{
 	//DELETE chronometer/{taskId}/part/{partId)				supprime une part
 	//POST chronometer/{taskId/part/{partId}/takeTiming 	prend le temps d'une part
 
-	@Route(path = "chronometer/(\\d+)", type = POST)
+	@Route(path = "chronometer/(\\d+)", type = POST, needLogin = true)
 	public int createChornometer(@Argument Task task){
 		return 0;
 	}
 	
-	@Route(path = "chronometer/(\\d+)")
+	@Route(path = "chronometer/(\\d+)", needLogin = true)
 	public ChronometerDto getChronometer(@Argument Task task){
 		return null;
 	}
 	
-	@Route(path = "chronometer/(\\d+)/part", type = POST)
+	@Route(path = "chronometer/(\\d+)/part", type = POST, needLogin = true)
 	public int createChronometerPart(@Argument Task task){
 		return 0;
 	}
 	
-	@Route(path = "chronometer/(\\d+)/part/(\\d+)", type = PUT)
+	@Route(path = "chronometer/(\\d+)/part/(\\d+)", type = PUT, needLogin = true)
 	public ChronometerPartDto editPart(@Argument Task task, @Argument(2) ChronometerPart chronometerPart){
 		return null;
 	}
 	
-	@Route(path = "chronometer/(\\d+)/part/(\\d+)", type = DELETE)
+	@Route(path = "chronometer/(\\d+)/part/(\\d+)", type = DELETE, needLogin = true)
 	public void deletePart(@Argument Task task, @Argument(2) ChronometerPart chronometerPart){
 		
 	}
 	
-	@Route(path = "chronometer/(\\d+)/part/(\\d+)/takeTiming", type = POST)
+	@Route(path = "chronometer/(\\d+)/part/(\\d+)/takeTiming", type = POST, needLogin = true)
 	public ChronometerPartDto takeTiming(@Argument Task task, @Argument(2) ChronometerPart chronometerPart){
 		return null;
 	}

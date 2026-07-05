@@ -1,7 +1,6 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
 import static dev.peerat.framework.RequestType.DELETE;
-import static dev.peerat.framework.RequestType.GET;
 import static dev.peerat.framework.RequestType.PATCH;
 import static dev.peerat.framework.RequestType.POST;
 import static dev.peerat.framework.RequestType.PUT;
@@ -22,27 +21,27 @@ public class StateController {
 	@Injection private StateRepository stateRepository;
 	@Injection private StateMapper stateMapper;
 	
-	@Route(path = "/states")
+	@Route(path = "/states", needLogin = true)
 	public List<StateDto> getStates() {
 		return stateMapper.toDto(stateRepository.findAll());
 	}
 
-	@Route(path = "/states", type = POST)
+	@Route(path = "/states", type = POST, needLogin = true)
 	public int createState(StateDto stateDto) {
 		return new State(0, stateDto.getName(), stateDto.getColor()).getId();
 	}
 	
-	@Route(path = "/states/(\\d+)", type = PUT)
+	@Route(path = "/states/(\\d+)", type = PUT, needLogin = true)
 	public void editState(StateDto stateDto, @Argument State state){
 		stateMapper.fullCopyDtoToModel(stateDto, state);
 	}
 	
-	@Route(path = "/states/(\\d+)", type = PATCH)
+	@Route(path = "/states/(\\d+)", type = PATCH, needLogin = true)
 	public void editPartialState(StateDto stateDto, @Argument State state){
 		stateMapper.safeCopyDtoToModel(stateDto, state);
 	}
 	
-	@Route(path = "/states/(\\d+)", type = DELETE)
+	@Route(path = "/states/(\\d+)", type = DELETE, needLogin = true)
 	public void deleteState(@Argument State state){
 		TreasureCache.delete(state);
 	}

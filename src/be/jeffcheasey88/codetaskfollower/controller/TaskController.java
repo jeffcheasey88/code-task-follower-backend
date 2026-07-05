@@ -27,48 +27,48 @@ public class TaskController{
 	@Injection private TaskMapper taskMapper;
 	@Injection private TagMapper tagMapper;
 	
-    @Route(path = "/tasks")
+    @Route(path = "/tasks", needLogin = true)
 	public List<LightTaskDto> getTasks(){
     	return taskMapper.toLightDto(taskRepository.findAll()).stream().map(taskDto -> new LightTaskDto(taskDto.id(), taskDto.name(), getTags(taskDto.id()), null)).toList();
 	}
 	
-	@Route(path = "/tasks/(\\d+)")
+	@Route(path = "/tasks/(\\d+)", needLogin = true)
 	public TaskDto getTask(@Argument Task task) {
 		TaskDto taskDto = taskMapper.toDto(task);
 		return new TaskDto(taskDto.id(), taskDto.name(), getTags(taskDto.id()), null, null, null, null, null);
 	}
 
-	@Route(path = "/tasks", type = POST)
+	@Route(path = "/tasks", type = POST, needLogin = true)
 	public int createTask(TaskDto taskDto) {
 		return new Task(0, taskDto.name(), null, null, null, null, null, null).getId();
 	}
 	
-	@Route(path = "/tasks/(\\d+)", type = PUT)
+	@Route(path = "/tasks/(\\d+)", type = PUT, needLogin = true)
 	public void editTask(TaskDto taskDto, @Argument Task task) {
         taskMapper.fullCopyDtoToModel(taskDto, task);
 	}
 	
-	@Route(path = "/tasks/(\\d+)", type = PATCH)
+	@Route(path = "/tasks/(\\d+)", type = PATCH, needLogin = true)
 	public void editPartialTask(TaskDto taskDto, @Argument Task task) {		
 		taskMapper.safeCopyDtoToModel(taskDto, task);
 	}
 	
-	@Route(path = "/tasks/(\\d+)", type = DELETE)
+	@Route(path = "/tasks/(\\d+)", type = DELETE, needLogin = true)
 	public void deleteTask(@Argument Task task) {
 		TreasureCache.delete(task);
 	}
 	
-	@Route(path = "/tasks/(\\d+)/tag/(\\d+)", type = PUT)
+	@Route(path = "/tasks/(\\d+)/tag/(\\d+)", type = PUT, needLogin = true)
 	public void addTaskTag(Matcher matcher) {
         TemporalRepository.INSTANCE.insertTaskTag(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
 	}
 	
-	@Route(path = "/tasks/(\\d+)/tag/(\\d+)", type = DELETE)
+	@Route(path = "/tasks/(\\d+)/tag/(\\d+)", type = DELETE, needLogin = true)
 	public void removeTaskTag(Matcher matcher) {
         TemporalRepository.INSTANCE.removeTaskTag(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
 	}
 	
-	@Route(path = "/tasks/(\\d+)/tags")
+	@Route(path = "/tasks/(\\d+)/tags", needLogin = true)
 	public List<TagDto> getTags(Matcher matcher){
 		return getTags(Integer.parseInt(matcher.group(1)));
 	}
@@ -77,7 +77,7 @@ public class TaskController{
 		return tagMapper.toDto(TemporalRepository.INSTANCE.selectTags(taskId));
 	}
 	
-	@Route(path = "/tasks/(\\d+)/state/(\\d+)", type = PUT)
+	@Route(path = "/tasks/(\\d+)/state/(\\d+)", type = PUT, needLogin = true)
 	public void updateTaskState(Matcher matcher){
         TemporalRepository.INSTANCE.updateTaskState(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
 	}

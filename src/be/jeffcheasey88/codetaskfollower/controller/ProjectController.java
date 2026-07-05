@@ -24,52 +24,52 @@ public class ProjectController {
 	@Injection private ProjectMapper projectMapper;
 	@Injection private StateMapper stateMapper;
 	
-	@Route(path = "/projects")
+	@Route(path = "/projects", needLogin = true)
 	public List<LightProjectDto> getProjects(){
 		return projectMapper.toLightDto(projectRepository.findAll());
 	}
 	
-	@Route(path = "/projects/(\\d+)")
+	@Route(path = "/projects/(\\d+)", needLogin = true)
 	public ProjectDto getProject(@Argument Project project) {
 		ProjectDto projectDto = projectMapper.toDto(project);
 		return new ProjectDto(projectDto.id(), projectDto.name(), projectDto.color(), projectDto.description());
 	}
 
-	@Route(path = "/projects", type = POST)
+	@Route(path = "/projects", type = POST, needLogin = true)
 	public int createProject(ProjectDto projectDto){
 		return (new Project(0, projectDto.name(), projectDto.color(), projectDto.description())).getId();
 	}
 	
 	// TODO : GET /projects/{id}/tasks/{stateId} 	récupere toutes les tâches d'un certain etat
 	
-	@Route(path = "/projects/(\\d+)", type = PUT)
+	@Route(path = "/projects/(\\d+)", type = PUT, needLogin = true)
 	public void editProject(@Argument Project project, ProjectDto projectDto) {
 		project.setName(projectDto.name());
 		project.setColor(projectDto.color());
 	}
 	
-	@Route(path = "/projects/(\\d+)", type = PATCH)
+	@Route(path = "/projects/(\\d+)", type = PATCH, needLogin = true)
 	public void editPartialProject(@Argument Project project, ProjectDto projectDto) {
 		if(projectDto.name() != null) project.setName(projectDto.name());
 		if(projectDto.color() != null) project.setColor(projectDto.color());
 	}
 	
-	@Route(path = "/projects/(\\d+)", type = DELETE)
+	@Route(path = "/projects/(\\d+)", type = DELETE, needLogin = true)
 	public void deleteProject(@Argument Project project) {
 		TreasureCache.delete(project);
 	}
 	
-	@Route(path = "/projects/(\\d+)/state/(\\d+)", type = PUT)
+	@Route(path = "/projects/(\\d+)/state/(\\d+)", type = PUT, needLogin = true)
 	public void addProjectState(Matcher matcher) {
         TemporalRepository.INSTANCE.insertProjectStates(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
 	}
 	
-	@Route(path = "/projects/(\\d+)/state/(\\d+)", type = DELETE)
+	@Route(path = "/projects/(\\d+)/state/(\\d+)", type = DELETE, needLogin = true)
 	public void removeProjectState(Matcher matcher) {
         TemporalRepository.INSTANCE.removeProjectStates(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
 	}
 	
-	@Route(path = "/projects/(\\d+)/states")
+	@Route(path = "/projects/(\\d+)/states", needLogin = true)
 	public List<StateDto> getStates(Matcher matcher){
 		return getStates(Integer.parseInt(matcher.group(1)));
 	}

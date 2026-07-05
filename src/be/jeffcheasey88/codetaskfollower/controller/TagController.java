@@ -1,11 +1,11 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
 import static dev.peerat.framework.RequestType.DELETE;
-import static dev.peerat.framework.RequestType.GET;
 import static dev.peerat.framework.RequestType.POST;
 import static dev.peerat.framework.RequestType.PUT;
 
 import java.util.List;
+import java.util.Map;
 
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Argument;
 import be.jeffcheasey88.codetaskfollower.dto.TagDto;
@@ -21,24 +21,27 @@ public class TagController {
 	@Injection private TagRepository tagRepository;
 	@Injection private TagMapper tagMapper;
 	
-	@Route(path = "/tags")
+	@Route(path = "/tags", needLogin = true)
 	public List<TagDto> getTags(){
 		return tagMapper.toDto(tagRepository.findAll());
 	}
 
-	@Route(path = "/tags", type = POST)
+	@Route(path = "/tags", type = POST, needLogin = true)
 	public int createTag(TagDto tagDto) {
 		return new Tag(0, tagDto.getName(), tagDto.getColor()).getId();
 	}
 	
-	@Route(path = "/tags/(\\d+)", type = PUT)
+	@Route(path = "/tags/(\\d+)", type = PUT, needLogin = true)
 	public void editTag(TagDto tagDto, @Argument Tag tag) {
 		tagMapper.fullCopyDtoToModel(tagDto, tag);
 	}
 	
-	@Route(path = "/tags/(\\d+)", type = DELETE)
+	@Route(path = "/tags/(\\d+)", type = DELETE, needLogin = true)
 	public void deleteTag(@Argument Tag tag) {
 		TreasureCache.delete(tag);
 	}
 	
+	public Map<String, Integer> test(){
+		return null;
+	}
 }
