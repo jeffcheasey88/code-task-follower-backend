@@ -7,8 +7,7 @@ import dev.peerat.framework.dependency.Injection;
 import dev.peerat.mapping.TreasureCache;
 
 @Injection
-public class StateRepository extends IntKeyRepository<State>{
-	
+public class StateRepository extends IntKeyRepository<State> {
 	@Override
 	public List<State> findAll() {
 		return TreasureCache.<State>selectAll().toList();
@@ -16,6 +15,6 @@ public class StateRepository extends IntKeyRepository<State>{
 
 	@Override
 	public State findById(Integer id) {
-		return TreasureCache.<State>selectAll().filter(tag -> tag.getId() == id).get();
+		return TreasureCache.<State>selectAll().filter(state -> state.getId() == id).get();
 	}
 }

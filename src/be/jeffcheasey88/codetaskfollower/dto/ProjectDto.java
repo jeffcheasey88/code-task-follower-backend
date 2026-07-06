@@ -1,8 +1,11 @@
 package be.jeffcheasey88.codetaskfollower.dto;
 
+import java.util.List;
+
 public record ProjectDto (
 	Integer id,
 	String name,
 	String color,
-	String description
+	String description,
+	List<StateDto> states
 ) {}

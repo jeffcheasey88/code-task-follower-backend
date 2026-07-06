@@ -9,7 +9,6 @@ import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Argument;
 import be.jeffcheasey88.codetaskfollower.dto.LightProjectDto;
 import be.jeffcheasey88.codetaskfollower.dto.ProjectDto;
 import be.jeffcheasey88.codetaskfollower.dto.StateDto;
-import be.jeffcheasey88.codetaskfollower.dto.TagDto;
 import be.jeffcheasey88.codetaskfollower.mapper.ProjectMapper;
 import be.jeffcheasey88.codetaskfollower.mapper.StateMapper;
 import be.jeffcheasey88.codetaskfollower.model.Project;
@@ -32,7 +31,7 @@ public class ProjectController {
 	@Route(path = "/projects/(\\d+)", needLogin = true)
 	public ProjectDto getProject(@Argument Project project) {
 		ProjectDto projectDto = projectMapper.toDto(project);
-		return new ProjectDto(projectDto.id(), projectDto.name(), projectDto.color(), projectDto.description());
+		return new ProjectDto(projectDto.id(), projectDto.name(), projectDto.color(), projectDto.description(), getStates(projectDto.id()));
 	}
 
 	@Route(path = "/projects", type = POST, needLogin = true)
