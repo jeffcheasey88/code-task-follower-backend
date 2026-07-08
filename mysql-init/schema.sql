@@ -22,7 +22,7 @@ CREATE TABLE ProjectStates(
 CREATE TABLE tasks(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     name varchar(255) NOT NULL,
-    stateId INTEGER NOT NULL,
+    stateId INTEGER,
     estimateSeconds INTEGER,
     CONSTRAINT fk_task_state FOREIGN KEY (stateId) REFERENCES states(id)
 );

@@ -70,6 +70,8 @@ public class ModelBinder implements ExecutableProvider{
 				Class<?> constructorType = constructorParameter.getType();
 				if(constructorType.equals(Integer.class) || constructorType.equals(Integer.TYPE)){
 					value = ((Number)value).intValue();
+				}else if(constructorType.getPackage().getName().contains("codetaskfollower.dto")){
+					value = toDto((JsonMap) value, constructorType);
 				}else if(Collection.class.isAssignableFrom(constructorType)){
 					Collection<Object> collection = new LinkedList<>();
 					JsonArray array = (JsonArray)value;

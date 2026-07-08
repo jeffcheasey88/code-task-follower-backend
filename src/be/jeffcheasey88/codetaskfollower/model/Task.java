@@ -7,7 +7,7 @@ import dev.peerat.mapping.Key;
 import dev.peerat.mapping.Treasure;
 
 @Treasure
-public class Task extends Model {
+public class Task extends Model{
 
 	@Key(auto=true) private int id;
 	

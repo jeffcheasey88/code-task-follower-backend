@@ -5,7 +5,7 @@ import java.util.List;
 public record TaskDto (
 		Integer id,
 	String name,
-	//StateDto state,
+	StateDto state,
 	List<TagDto> tags,
 	List<TaskDto> dependencies,
 	//ChronometerDto chronometer,

@@ -1,6 +1,7 @@
 package be.jeffcheasey88.codetaskfollower.dto;
 
 public class StateDto{
+	
 	private Integer id;
 	private String name;
 	private String color;

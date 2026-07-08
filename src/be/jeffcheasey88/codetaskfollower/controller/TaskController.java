@@ -33,14 +33,16 @@ public class TaskController{
 	}
 	
 	@Route(path = "/tasks/(\\d+)", needLogin = true)
-	public TaskDto getTask(@Argument Task task) {
+	public TaskDto getTask(@Argument Task task){
 		TaskDto taskDto = taskMapper.toDto(task);
-		return new TaskDto(taskDto.id(), taskDto.name(), getTags(taskDto.id()), null, null, null, null, null);
+		return new TaskDto(taskDto.id(), taskDto.name(), null, getTags(taskDto.id()), null, null, null, null, null);
 	}
 
 	@Route(path = "/tasks", type = POST, needLogin = true)
-	public int createTask(TaskDto taskDto) {
-		return new Task(0, taskDto.name(), null, null, null, null, null, null).getId();
+	public int createTask(TaskDto taskDto){
+		Task task = new Task(0, taskDto.name(), null, null, null, null, null, null);
+		TemporalRepository.INSTANCE.updateTaskState(task.getId(), taskDto.state().getId());
+		return task.getId();
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = PUT, needLogin = true)
