@@ -11,8 +11,13 @@ import dev.peerat.mapping.CursedTreasureException;
 import dev.peerat.mapping.Ship;
 import dev.peerat.mapping.ShipwreckException;
 import dev.peerat.mapping.providers.mysql.MySQLCompass;
+import be.jeffcheasey88.codetaskfollower.model.Branch;
+import be.jeffcheasey88.codetaskfollower.model.Code;
+import be.jeffcheasey88.codetaskfollower.model.Commit;
+import be.jeffcheasey88.codetaskfollower.model.Project;
 import be.jeffcheasey88.codetaskfollower.model.State;
 import be.jeffcheasey88.codetaskfollower.model.Tag;
+import be.jeffcheasey88.codetaskfollower.model.Task;
 
 public class TemporalRepository{
 	
@@ -38,6 +43,20 @@ public class TemporalRepository{
 			PreparedStatement p = this.con.prepareStatement("INSERT INTO ProjectStates (projectId,stateId) VALUES (?,?)");
 			p.setInt(1, projectId);
 			p.setInt(2, stateId);
+			if(p.executeUpdate() >= 0) return;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
+		}
+
+		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	}
+
+	public void insertProjectTasks(int projectId, int taskId){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement("INSERT INTO TaskProject (projectId,taskId) VALUES (?,?)");
+			p.setInt(1, projectId);
+			p.setInt(2, taskId);
 			if(p.executeUpdate() >= 0) return;
 		}catch(Exception e){
 			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
@@ -320,6 +339,33 @@ public class TemporalRepository{
 		}
 	}
 	
+	public List<Task> selectTasks(int projectId){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement("SELECT t.* FROM tasks t JOIN TaskProject tp ON tp.taskId = t.id WHERE tp.projectId = ?");
+			p.setInt(1, projectId);
+			ResultSet r = p.executeQuery();
+			List<Task> l = new ArrayList<>();
+			while(r.next()) l.add(trickTask(r.getInt("t.id"), r.getString("t.name")));
+			return l;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to get the treasure from the treasure's cache", e);
+		}
+	}
+
+	public State selectStateForTask(int taskId) {
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement("SELECT s.* FROM tasks t JOIN states s ON t.stateId = s.id WHERE t.id = ?");
+			p.setInt(1, taskId);
+			ResultSet r = p.executeQuery();
+			r.next();
+			return trickState(r.getInt("s.id"), r.getString("s.name"), r.getString("s.color"));
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to get the treasure from the treasure's cache", e);
+		}
+	}
+
 	interface NewTag{
 		Tag create(int id, String name, String color);
 	}
@@ -335,5 +381,13 @@ public class TemporalRepository{
 	private State trickState(int id, String name, String color){
 		NewState creator = State::new;
 		return creator.create(id, name, color);
+	}
+
+	interface NewTask{
+		Task create(int id, String name, List<Tag> tags, List<Task> dependencies, List<Project> projects, List<Commit> commits, List<Branch> branches, List<Code> codes);
+	}
+	private Task trickTask(int id, String name){
+		NewTask creator = Task::new;
+		return creator.create(id, name, null, null, null, null, null, null);
 	}
 }

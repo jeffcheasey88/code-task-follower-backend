@@ -7,5 +7,6 @@ public record ProjectDto (
 	String name,
 	String color,
 	String description,
-	List<StateDto> states
+	List<StateDto> states,
+	List<TaskDto> tasks
 ) {}
