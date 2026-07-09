@@ -6,7 +6,7 @@ services:
       MYSQL_DATABASE: code-task-follower
       MYSQL_ROOT_PASSWORD: root
     ports:
-      - "3306:3306"
+      - ":3306"
     volumes:
       - database-data:/var/lib/mysql
       - ./mysql-init:/docker-entrypoint-initdb.d:ro
