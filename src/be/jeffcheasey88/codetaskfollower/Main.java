@@ -26,8 +26,19 @@ import dev.peerat.mapping.Ship;
 import dev.peerat.mapping.providers.mysql.MySQLCompass;
 
 public class Main{
+	
+	private static final String COLOR_RESET  = "\u001B[0m";
+	private static final String COLOR_RED    = "\u001B[31m";
+	private static final String COLOR_GREEN  = "\u001B[32m";
+	private static final String COLOR_YELLOW = "\u001B[33m";
+	private static final String COLOR_BLUE   = "\u001B[34m";
 
 	public static void main(String[] args) throws Exception{
+		boolean acceptColor = true;
+		if(args != null && args.length > 0 && args[0].equalsIgnoreCase("no-color")){
+			acceptColor = false;
+		}
+		
 		Ship ship = new Ship("mysql", new MySQLCompass("database", 3306, "code-task-follower", "root", "root"), new DatabaseConfiguration());
 		ship.setSails();
 		TemporalRepository.INSTANCE.connector(ship); //TODO remove
@@ -52,12 +63,29 @@ public class Main{
 		router.setAuthenticator(new Authenticator());
 		router.bind(new ModelBinder(injector));
 		
+		final boolean colorAccepted = acceptColor;
 		new Thread(() -> router.getLogger().listen(context -> {
 				RequestType type = context.getType();
 				if(type.equals(RequestType.OPTIONS)) return;
 				String prefix = "";
-				if(context.isLogged()) prefix = "("+context.<User>getUser().getName()+") ";
-				System.out.println(prefix+"["+type+"] "+context.getPath()+" -> "+context.getResponseCode());
+				if(context.isLogged()){
+					if(colorAccepted) prefix+=COLOR_BLUE;
+					prefix += "("+context.<User>getUser().getName()+")";
+					if(colorAccepted) prefix+=COLOR_RESET;
+					prefix+=" ";
+				}
+				int responseCode = context.getResponseCode();
+				if(colorAccepted){
+					if(responseCode >= 200 && responseCode < 300){
+						System.out.println(prefix+COLOR_GREEN+"["+type+"] "+context.getPath()+COLOR_RESET);
+					}else if(responseCode == 0 || responseCode >= 500){
+						System.out.println(prefix+"["+type+"] "+context.getPath()+" -> "+COLOR_RED+""+responseCode+""+COLOR_RESET);
+					}else{
+						System.out.println(prefix+"["+type+"] "+context.getPath()+" -> "+COLOR_YELLOW+""+responseCode+""+COLOR_RESET);
+					}
+				}else{
+					System.out.println(prefix+"["+type+"] "+context.getPath()+" -> "+responseCode);
+				}
 			}, Throwable::printStackTrace
 		)).start();
 		
@@ -80,6 +108,8 @@ public class Main{
 			System.out.println("\t["+type+"] "+route.getRoute().path()+returnType+" needLogin:"+route.getRoute().needLogin());
 		}
 		System.out.println();
+		
+		System.out.println("so "+System.getenv("TERM"));
 		
 		router.listen(8001, false);
 	}
