@@ -13,6 +13,7 @@ import be.jeffcheasey88.codetaskfollower.dto.StateDto;
 import be.jeffcheasey88.codetaskfollower.mapper.StateMapper;
 import be.jeffcheasey88.codetaskfollower.model.State;
 import be.jeffcheasey88.codetaskfollower.repository.StateRepository;
+import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
 import dev.peerat.framework.Locker;
 import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
@@ -37,11 +38,13 @@ public class StateController {
 	@Route(path = "/states/(\\d+)", type = PUT, needLogin = true)
 	public void editState(StateDto stateDto, @Argument State state){
 		stateMapper.fullCopyDtoToModel(stateDto, state);
+		TemporalRepository.INSTANCE.updateState(state);
 	}
 	
 	@Route(path = "/states/(\\d+)", type = PATCH, needLogin = true)
 	public void editPartialState(StateDto stateDto, @Argument State state){
 		stateMapper.safeCopyDtoToModel(stateDto, state);
+		TemporalRepository.INSTANCE.updateState(state);
 	}
 	
 	@Route(path = "/states/(\\d+)", type = DELETE, needLogin = true)

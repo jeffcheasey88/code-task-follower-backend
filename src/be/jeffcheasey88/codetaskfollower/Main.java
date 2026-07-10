@@ -16,8 +16,10 @@ import be.jeffcheasey88.codetaskfollower.configuration.DatabaseConfiguration;
 import be.jeffcheasey88.codetaskfollower.configuration.Mapper;
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder;
 import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
+import dev.peerat.framework.Locker;
 import dev.peerat.framework.RequestType;
 import dev.peerat.framework.Router;
+import dev.peerat.framework.auth.AuthException;
 import dev.peerat.framework.dependency.DependencyInjector;
 import dev.peerat.framework.routes.RouteState;
 import dev.peerat.mapping.Ship;
@@ -40,6 +42,7 @@ public class Main{
 		
 		DependencyInjector injector = new DependencyInjector()
 				.of(router)
+				.of(Locker.class, Locker::new)
 				.ofServices();
 		
 		Mapper mapper = new Mapper();
@@ -58,7 +61,13 @@ public class Main{
 			}, Throwable::printStackTrace
 		)).start();
 		
-		new Thread(() ->  router.getExceptionLogger().listen(Throwable::printStackTrace, Throwable::printStackTrace)).start();
+		new Thread(() ->  router.getExceptionLogger().listen(throwable -> {
+			if(throwable instanceof AuthException){
+				System.err.println("erreur d'authentification");
+				return;
+			}
+			throwable.printStackTrace();
+		}, Throwable::printStackTrace)).start();
 		
 		router.registerPackages("be.jeffcheasey88.codetaskfollower.controller", injector);
 		

@@ -32,18 +32,18 @@ public class TaskController{
 	
     @Route(path = "/tasks", needLogin = true)
 	public List<LightTaskDto> getTasks(){
-    	return taskMapper.toLightDto(taskRepository.findAll()).stream().map(taskDto -> new LightTaskDto(taskDto.id(), taskDto.name(), getTags(taskDto.id()), null)).toList();
+    	return taskMapper.toLightDto(taskRepository.findAll()).stream().map(taskDto -> new LightTaskDto(taskDto.id(), taskDto.name(), taskDto.description(), getTags(taskDto.id()), null)).toList();
 	}
 	
 	@Route(path = "/tasks/(\\d+)", needLogin = true)
 	public TaskDto getTask(@Argument Task task){
 		TaskDto taskDto = taskMapper.toDto(task);
-		return new TaskDto(taskDto.id(), taskDto.name(), null, getTags(taskDto.id()), null, null, null, null, null);
+		return new TaskDto(taskDto.id(), taskDto.name(), taskDto.description(), null, getTags(taskDto.id()), null, null, null, null, null);
 	}
 
 	@Route(path = "/tasks", type = POST, needLogin = true)
 	public int createTask(TaskDto taskDto){
-		Task task = new Task(0, taskDto.name(), null, null, null, null, null, null);
+		Task task = new Task(0, taskDto.name(), taskDto.description(), null, null, null, null, null, null);
 		TemporalRepository.INSTANCE.updateTaskState(task.getId(), taskDto.state().getId());
 		modelLocker.pushValue(new ModelUpdateDto(task, "create"));
 		return task.getId();
@@ -52,12 +52,14 @@ public class TaskController{
 	@Route(path = "/tasks/(\\d+)", type = PUT, needLogin = true)
 	public void editTask(TaskDto taskDto, @Argument Task task) {
         taskMapper.fullCopyDtoToModel(taskDto, task);
+        TemporalRepository.INSTANCE.updateTask(task);
         modelLocker.pushValue(new ModelUpdateDto(task, "update"));
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = PATCH, needLogin = true)
-	public void editPartialTask(TaskDto taskDto, @Argument Task task) {		
+	public void editPartialTask(TaskDto taskDto, @Argument Task task) {	
 		taskMapper.safeCopyDtoToModel(taskDto, task);
+		TemporalRepository.INSTANCE.updateTask(task);
 		modelLocker.pushValue(new ModelUpdateDto(task, "update"));
 	}
 	

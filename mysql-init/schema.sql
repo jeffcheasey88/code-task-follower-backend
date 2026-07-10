@@ -24,6 +24,7 @@ CREATE TABLE tasks(
     name varchar(255) NOT NULL,
     stateId INTEGER,
     estimateSeconds INTEGER,
+    description text,
     CONSTRAINT fk_task_state FOREIGN KEY (stateId) REFERENCES states(id)
 );
 

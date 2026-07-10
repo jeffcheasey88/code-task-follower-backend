@@ -13,6 +13,7 @@ public class Task extends Model{
 	
 	@Min
 	private String name;
+	private String description;
 	//private State state;
 	//private Chronometer chronometer;
 	private List<Tag> tags;
@@ -22,11 +23,12 @@ public class Task extends Model{
 	private List<Branch> branches;
 	private List<Code> codes;
 	
-	public Task(int id, String name, 
+	public Task(int id, String name, String description,
 			//State state, Chronometer chronometer,
 			List<Tag> tags, List<Task> dependencies, List<Project> projects, List<Commit> commits, List<Branch> branches, List<Code> codes){
 		this.id = id;
 		this.name = name;
+		this.description = description;
 //		this.state = state;
 //		this.chronometer = chronometer;
 		this.tags = tags;
@@ -47,6 +49,11 @@ public class Task extends Model{
 	public String getName() {
 		return name;
 	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
 	public List<Tag> getTags() {
 		return tags;
 	}
@@ -68,5 +75,9 @@ public class Task extends Model{
 
 	public void setName(String name) {
 		this.name = check("name", name);
+	}
+	
+	public void setDescription(String description){
+		this.description = check("description", description);
 	}
 }

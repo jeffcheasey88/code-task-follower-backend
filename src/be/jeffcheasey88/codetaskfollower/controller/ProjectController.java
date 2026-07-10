@@ -58,12 +58,16 @@ public class ProjectController {
 	public void editProject(@Argument Project project, ProjectDto projectDto) {
 		project.setName(projectDto.name());
 		project.setColor(projectDto.color());
+		project.setDescription(projectDto.description());
+		TemporalRepository.INSTANCE.updateProject(project);
 	}
 	
 	@Route(path = "/projects/(\\d+)", type = PATCH, needLogin = true)
 	public void editPartialProject(@Argument Project project, ProjectDto projectDto) {
 		if(projectDto.name() != null) project.setName(projectDto.name());
 		if(projectDto.color() != null) project.setColor(projectDto.color());
+		if(projectDto.description() != null) project.setDescription(projectDto.description());
+		TemporalRepository.INSTANCE.updateProject(project);
 	}
 	
 	@Route(path = "/projects/(\\d+)", type = DELETE, needLogin = true)
@@ -96,6 +100,6 @@ public class ProjectController {
 	}
 
 	public List<TaskDto> getTasks(int projectId){
-		return taskMapper.toDto(TemporalRepository.INSTANCE.selectTasks(projectId)).stream().map(t -> new TaskDto(t.id(), t.name(), stateMapper.toDto(TemporalRepository.INSTANCE.selectStateForTask(t.id())), tagMapper.toDto(TemporalRepository.INSTANCE.selectTags(t.id())), null, null, null, null, null)).toList();
+		return taskMapper.toDto(TemporalRepository.INSTANCE.selectTasks(projectId)).stream().map(t -> new TaskDto(t.id(), t.name(), t.description(), stateMapper.toDto(TemporalRepository.INSTANCE.selectStateForTask(t.id())), tagMapper.toDto(TemporalRepository.INSTANCE.selectTags(t.id())), null, null, null, null, null)).toList();
 	}
 }

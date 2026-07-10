@@ -15,6 +15,7 @@ public class TaskMapper extends Mapper<TaskDto, LightTaskDto, Task>{
 		return new TaskDto(
 			model.getId(),
 			model.getName(),
+			model.getDescription(),
 			null, //model.getState(),
 			tagMapper.toDto(model.getTags()),
 			toDto(model.getDependencies()),
@@ -31,6 +32,7 @@ public class TaskMapper extends Mapper<TaskDto, LightTaskDto, Task>{
 		return new LightTaskDto(
 			model.getId(),
 			model.getName(),
+			model.getDescription(),
 			//model.getState(),
 			tagMapper.toDto(model.getTags()),
 			toDto(model.getDependencies())
@@ -39,13 +41,13 @@ public class TaskMapper extends Mapper<TaskDto, LightTaskDto, Task>{
 
 	@Override
 	public void fullCopyDtoToModel(TaskDto dto, Task model) {
-		// TODO Auto-generated method stub
-		
+		model.setName(dto.name());
+		model.setDescription(dto.description());
 	}
 
 	@Override
 	public void safeCopyDtoToModel(TaskDto dto, Task model) {
-		// TODO Auto-generated method stub
-		
+		if(dto.name() != null) model.setName(dto.name());
+		if(dto.description() != null) model.setDescription(dto.description());
 	}
 }

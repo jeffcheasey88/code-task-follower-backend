@@ -391,6 +391,64 @@ public class TemporalRepository{
 			throw new CursedTreasureException("Failed to get the treasure from the treasure's cache", e);
 		}
 	}
+	
+	//UPDATES
+	public void updateTask(Task task){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement("UPDATE tasks SET name = ?, description = ? WHERE id = ?");
+			p.setString(1, task.getName());
+			p.setString(2, task.getDescription());
+			p.setInt(3, task.getId());
+			if(p.executeUpdate() >= 0) return;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
+		}
+		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	}
+	
+	public void updateTag(Tag tag){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement("UPDATE tags SET name = ?, color = ? WHERE id = ?");
+			p.setString(1, tag.getName());
+			p.setString(2, tag.getColor());
+			p.setInt(3, tag.getId());
+			if(p.executeUpdate() >= 0) return;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
+		}
+		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	}
+	
+	public void updateState(State state){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement("UPDATE states SET name = ?, color = ? WHERE id = ?");
+			p.setString(1, state.getName());
+			p.setString(2, state.getColor());
+			p.setInt(3, state.getId());
+			if(p.executeUpdate() >= 0) return;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
+		}
+		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	}
+	
+	public void updateProject(Project project){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement("UPDATE projects SET name = ?, color = ?, description = ? WHERE id = ?");
+			p.setString(1, project.getName());
+			p.setString(2, project.getColor());
+			p.setString(3, project.getDescription());
+			p.setInt(4, project.getId());
+			if(p.executeUpdate() >= 0) return;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
+		}
+		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	}
 
 	interface NewTag{
 		Tag create(int id, String name, String color);
@@ -410,10 +468,10 @@ public class TemporalRepository{
 	}
 
 	interface NewTask{
-		Task create(int id, String name, List<Tag> tags, List<Task> dependencies, List<Project> projects, List<Commit> commits, List<Branch> branches, List<Code> codes);
+		Task create(int id, String name, String description, List<Tag> tags, List<Task> dependencies, List<Project> projects, List<Commit> commits, List<Branch> branches, List<Code> codes);
 	}
 	private Task trickTask(int id, String name){
 		NewTask creator = Task::new;
-		return creator.create(id, name, null, null, null, null, null, null);
+		return creator.create(id, name, null, null, null, null, null, null, null);
 	}
 }
