@@ -39,16 +39,19 @@ public class StateController {
 	public void editState(StateDto stateDto, @Argument State state){
 		stateMapper.fullCopyDtoToModel(stateDto, state);
 		TemporalRepository.INSTANCE.updateState(state);
+		modelLocker.pushValue(new ModelUpdateDto(stateMapper.toDto(state), "update"));
 	}
 	
 	@Route(path = "/states/(\\d+)", type = PATCH, needLogin = true)
 	public void editPartialState(StateDto stateDto, @Argument State state){
 		stateMapper.safeCopyDtoToModel(stateDto, state);
 		TemporalRepository.INSTANCE.updateState(state);
+		modelLocker.pushValue(new ModelUpdateDto(stateMapper.toDto(state), "update"));
 	}
 	
 	@Route(path = "/states/(\\d+)", type = DELETE, needLogin = true)
 	public void deleteState(@Argument State state){
 		TreasureCache.delete(state);
+		modelLocker.pushValue(new ModelUpdateDto(stateMapper.toDto(state), "delete"));
 	}
 }

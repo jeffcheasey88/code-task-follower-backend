@@ -38,11 +38,13 @@ public class TagController {
 	public void editTag(TagDto tagDto, @Argument Tag tag){
 		tagMapper.fullCopyDtoToModel(tagDto, tag);
 		TemporalRepository.INSTANCE.updateTag(tag);
+		modelLocker.pushValue(new ModelUpdateDto(tagMapper.toDto(tag), "update"));
 	}
 	
 	@Route(path = "/tags/(\\d+)", type = DELETE, needLogin = true)
 	public void deleteTag(@Argument Tag tag) {
 		TreasureCache.delete(tag);
+		modelLocker.pushValue(new ModelUpdateDto(tagMapper.toDto(tag), "delete"));
 	}
 	
 }

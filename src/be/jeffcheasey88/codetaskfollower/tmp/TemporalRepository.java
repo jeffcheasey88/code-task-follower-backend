@@ -5,7 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import dev.peerat.mapping.CursedTreasureException;
 import dev.peerat.mapping.Ship;
@@ -37,12 +39,14 @@ public class TemporalRepository{
 	}
 	
 	//ProjectStates (projectId, stateId)
-	public void insertProjectStates(int projectId, int stateId){
+	public void insertProjectStates(Project project, State state){
 		ensureConnection();
 		try{
 			PreparedStatement p = this.con.prepareStatement("INSERT INTO ProjectStates (projectId,stateId) VALUES (?,?)");
-			p.setInt(1, projectId);
-			p.setInt(2, stateId);
+			p.setInt(1, project.getId());
+			p.setInt(2, state.getId());
+			if(project.getStates() == null) project.setStates(new LinkedList<>());
+			project.getStates().add(state);
 			if(p.executeUpdate() >= 0) return;
 		}catch(Exception e){
 			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
@@ -65,12 +69,15 @@ public class TemporalRepository{
 		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
 	}
 	
-	public void removeProjectStates(int projectId, int stateId){
+	public void removeProjectStates(Project project, State state){
 		ensureConnection();
 		try{
 			PreparedStatement p = this.con.prepareStatement("DELETE FROM ProjectStates WHERE projectId = ? AND stateId = ?");
-			p.setInt(1, projectId);
-			p.setInt(2, stateId);
+			p.setInt(1, project.getId());
+			p.setInt(2, state.getId());
+			if(project.getStates() != null){
+				project.setStates(project.getStates().stream().filter(s->s.getId() != state.getId()).toList());
+			}
 			if(p.executeUpdate() >= 0) return;
 		}catch(Exception e){
 			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
@@ -265,12 +272,14 @@ public class TemporalRepository{
 	}
 	
 	//TaskTag (taskId, tagId)
-	public void insertTaskTag(int taskId, int tagId){
+	public void insertTaskTag(Task task, Tag tag){
 		ensureConnection();
 		try{
 			PreparedStatement p = this.con.prepareStatement("INSERT INTO TaskTag (taskId,tagId) VALUES (?,?)");
-			p.setInt(1, taskId);
-			p.setInt(2, tagId);
+			p.setInt(1, task.getId());
+			p.setInt(2, tag.getId());
+			if(task.getTags() == null) task.setTags(new LinkedList<>());
+			task.getTags().add(tag);
 			if(p.executeUpdate() >= 0) return;
 		}catch(Exception e){
 			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
@@ -279,12 +288,15 @@ public class TemporalRepository{
 		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
 	}
 	
-	public void removeTaskTag(int taskId, int tagId){
+	public void removeTaskTag(Task task, Tag tag){
 		ensureConnection();
 		try{
 			PreparedStatement p = this.con.prepareStatement("DELETE FROM TaskTag WHERE taskId = ? AND tagId = ?");
-			p.setInt(1, taskId);
-			p.setInt(2, tagId);
+			p.setInt(1, task.getId());
+			p.setInt(2, tag.getId());
+			if(task.getTags() != null){
+				task.setTags(task.getTags().stream().filter(t->t.getId() != tag.getId()).toList());
+			}
 			if(p.executeUpdate() >= 0) return;
 		}catch(Exception e){
 			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);

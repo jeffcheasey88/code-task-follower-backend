@@ -1,5 +1,6 @@
 package be.jeffcheasey88.codetaskfollower.model;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import be.jeffcheasey88.codetaskfollower.validator.MaxValidator.Max;
@@ -77,5 +78,9 @@ public class Project extends Model {
 
 	public List<Task> getTasks() {
 		return this.tasks;
+	}
+
+	public void setStates(List<State> states){
+		this.states = states;
 	}
 }

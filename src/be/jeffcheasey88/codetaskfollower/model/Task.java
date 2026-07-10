@@ -80,4 +80,8 @@ public class Task extends Model{
 	public void setDescription(String description){
 		this.description = check("description", description);
 	}
+
+	public void setTags(List<Tag> tags){
+		this.tags = tags;
+	}
 }

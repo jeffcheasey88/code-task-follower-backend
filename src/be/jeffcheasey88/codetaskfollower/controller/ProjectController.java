@@ -19,7 +19,9 @@ import be.jeffcheasey88.codetaskfollower.mapper.StateMapper;
 import be.jeffcheasey88.codetaskfollower.mapper.TagMapper;
 import be.jeffcheasey88.codetaskfollower.mapper.TaskMapper;
 import be.jeffcheasey88.codetaskfollower.model.Project;
+import be.jeffcheasey88.codetaskfollower.model.State;
 import be.jeffcheasey88.codetaskfollower.repository.ProjectRepository;
+import be.jeffcheasey88.codetaskfollower.repository.StateRepository;
 import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
 import dev.peerat.framework.Locker;
 import dev.peerat.framework.dependency.Injection;
@@ -30,6 +32,7 @@ public class ProjectController {
 	@Injection private ProjectRepository projectRepository;
 	@Injection private ProjectMapper projectMapper;
 	@Injection private StateMapper stateMapper;
+	@Injection private StateRepository stateRepository;
 	@Injection private TaskMapper taskMapper;
 	@Injection private TagMapper tagMapper;
 	@Injection("modelUpdater") private Locker<ModelUpdateDto> modelLocker;
@@ -60,6 +63,7 @@ public class ProjectController {
 		project.setColor(projectDto.color());
 		project.setDescription(projectDto.description());
 		TemporalRepository.INSTANCE.updateProject(project);
+		modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "update"));
 	}
 	
 	@Route(path = "/projects/(\\d+)", type = PATCH, needLogin = true)
@@ -68,16 +72,20 @@ public class ProjectController {
 		if(projectDto.color() != null) project.setColor(projectDto.color());
 		if(projectDto.description() != null) project.setDescription(projectDto.description());
 		TemporalRepository.INSTANCE.updateProject(project);
+		modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "update"));
 	}
 	
 	@Route(path = "/projects/(\\d+)", type = DELETE, needLogin = true)
 	public void deleteProject(@Argument Project project) {
 		TreasureCache.delete(project);
+		modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "delete"));
 	}
 	
 	@Route(path = "/projects/(\\d+)/state/(\\d+)", type = PUT, needLogin = true)
-	public void addProjectState(Matcher matcher) {
-        TemporalRepository.INSTANCE.insertProjectStates(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
+	public void addProjectState(Matcher matcher, Project project) {
+		State state = stateRepository.findById(Integer.parseInt(matcher.group(2)));
+        TemporalRepository.INSTANCE.insertProjectStates(project, state);
+        modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "update"));
 	}
 
 	@Route(path = "/projects/(\\d+)/task/(\\d+)", type = PUT, needLogin = true)
@@ -86,8 +94,10 @@ public class ProjectController {
 	}
 	
 	@Route(path = "/projects/(\\d+)/state/(\\d+)", type = DELETE, needLogin = true)
-	public void removeProjectState(Matcher matcher) {
-        TemporalRepository.INSTANCE.removeProjectStates(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
+	public void removeProjectState(Matcher matcher, Project project) {
+		State state = stateRepository.findById(Integer.parseInt(matcher.group(2)));
+        TemporalRepository.INSTANCE.removeProjectStates(project, state);
+        modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "delete"));
 	}
 	
 	@Route(path = "/projects/(\\d+)/states", needLogin = true)

@@ -15,7 +15,9 @@ import be.jeffcheasey88.codetaskfollower.dto.TagDto;
 import be.jeffcheasey88.codetaskfollower.dto.TaskDto;
 import be.jeffcheasey88.codetaskfollower.mapper.TagMapper;
 import be.jeffcheasey88.codetaskfollower.mapper.TaskMapper;
+import be.jeffcheasey88.codetaskfollower.model.Tag;
 import be.jeffcheasey88.codetaskfollower.model.Task;
+import be.jeffcheasey88.codetaskfollower.repository.TagRepository;
 import be.jeffcheasey88.codetaskfollower.repository.TaskRepository;
 import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
 import dev.peerat.framework.Locker;
@@ -28,6 +30,7 @@ public class TaskController{
 	@Injection private TaskRepository taskRepository;
 	@Injection private TaskMapper taskMapper;
 	@Injection private TagMapper tagMapper;
+	@Injection private TagRepository tagRepository;
 	@Injection("modelUpdater") private Locker<ModelUpdateDto> modelLocker;
 	
     @Route(path = "/tasks", needLogin = true)
@@ -53,14 +56,14 @@ public class TaskController{
 	public void editTask(TaskDto taskDto, @Argument Task task) {
         taskMapper.fullCopyDtoToModel(taskDto, task);
         TemporalRepository.INSTANCE.updateTask(task);
-        modelLocker.pushValue(new ModelUpdateDto(task, "update"));
+        modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "update"));
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = PATCH, needLogin = true)
 	public void editPartialTask(TaskDto taskDto, @Argument Task task) {	
 		taskMapper.safeCopyDtoToModel(taskDto, task);
 		TemporalRepository.INSTANCE.updateTask(task);
-		modelLocker.pushValue(new ModelUpdateDto(task, "update"));
+		modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "update"));
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = DELETE, needLogin = true)
@@ -68,17 +71,21 @@ public class TaskController{
 		TemporalRepository.INSTANCE.removeTaskAnyProject(task.getId());
 		TemporalRepository.INSTANCE.removeTaskAnyTag(task.getId());
 		TreasureCache.delete(task);
-		modelLocker.pushValue(new ModelUpdateDto(task, "delete"));
+		modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "delete"));
 	}
 	
 	@Route(path = "/tasks/(\\d+)/tag/(\\d+)", type = PUT, needLogin = true)
-	public void addTaskTag(Matcher matcher) {
-        TemporalRepository.INSTANCE.insertTaskTag(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
+	public void addTaskTag(Matcher matcher, Task task){
+		Tag tag = tagRepository.findById(Integer.parseInt(matcher.group(2)));
+        TemporalRepository.INSTANCE.insertTaskTag(task, tag);
+        modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "update"));
 	}
 	
 	@Route(path = "/tasks/(\\d+)/tag/(\\d+)", type = DELETE, needLogin = true)
-	public void removeTaskTag(Matcher matcher) {
-        TemporalRepository.INSTANCE.removeTaskTag(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
+	public void removeTaskTag(Matcher matcher, Task task) {
+		Tag tag = tagRepository.findById(Integer.parseInt(matcher.group(2)));
+        TemporalRepository.INSTANCE.removeTaskTag(task, tag);
+        modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "update"));
 	}
 	
 	@Route(path = "/tasks/(\\d+)/tags", needLogin = true)
