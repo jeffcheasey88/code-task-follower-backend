@@ -29,7 +29,7 @@ services:
       dockerfile: Dockerfile
     container_name: ctf-frontend
     ports:
-      - "88:80"
+      - "80:80"
     networks:
       - ctf-network
 

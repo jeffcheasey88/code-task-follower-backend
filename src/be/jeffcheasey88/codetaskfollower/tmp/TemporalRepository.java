@@ -122,6 +122,32 @@ public class TemporalRepository{
 
 		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
 	}
+
+	public void removeTaskAnyProject(int taskId){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement("DELETE FROM TaskProject WHERE taskId = ?");
+			p.setInt(1, taskId);
+			if(p.executeUpdate() >= 0) return;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
+		}
+
+		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	}
+
+	public void removeTaskAnyTag(int taskId){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement("DELETE FROM TaskTag WHERE taskId = ?");
+			p.setInt(1, taskId);
+			if(p.executeUpdate() >= 0) return;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
+		}
+
+		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	}
 	
 	//CommitTask (commitId, taskId)
 	public void insertCommitTask(int commitId, int taskId){

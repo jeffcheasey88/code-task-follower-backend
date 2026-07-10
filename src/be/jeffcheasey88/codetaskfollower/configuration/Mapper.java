@@ -41,10 +41,9 @@ public class Mapper implements ResponseMapper, Response, ExceptionResponse{
 				return;
 			}
 			String value = toJson(result).toString();
-			context.response(200, "Content-Type: application/json", "Content-Length: "+value.length());
+			context.response(200, "Content-Type: application/json", "Content-Length: "+(value.getBytes().length));
 			writer.write(value);
 			writer.flush();
-			writer.safeWait(10000);
 		}else{
 			if(context.getResponseCode() == 0) context.response(200);
 		}
