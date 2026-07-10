@@ -8,10 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Argument;
+import be.jeffcheasey88.codetaskfollower.dto.ModelUpdateDto;
 import be.jeffcheasey88.codetaskfollower.dto.TagDto;
 import be.jeffcheasey88.codetaskfollower.mapper.TagMapper;
 import be.jeffcheasey88.codetaskfollower.model.Tag;
 import be.jeffcheasey88.codetaskfollower.repository.TagRepository;
+import dev.peerat.framework.Locker;
 import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
 import dev.peerat.mapping.TreasureCache;
@@ -20,6 +22,7 @@ public class TagController {
 	
 	@Injection private TagRepository tagRepository;
 	@Injection private TagMapper tagMapper;
+	@Injection("modelUpdater") private Locker<ModelUpdateDto> modelLocker;
 	
 	@Route(path = "/tags", needLogin = true)
 	public List<TagDto> getTags(){

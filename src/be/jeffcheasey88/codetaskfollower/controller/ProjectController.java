@@ -1,12 +1,16 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
-import static dev.peerat.framework.RequestType.*;
+import static dev.peerat.framework.RequestType.DELETE;
+import static dev.peerat.framework.RequestType.PATCH;
+import static dev.peerat.framework.RequestType.POST;
+import static dev.peerat.framework.RequestType.PUT;
 
 import java.util.List;
 import java.util.regex.Matcher;
 
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Argument;
 import be.jeffcheasey88.codetaskfollower.dto.LightProjectDto;
+import be.jeffcheasey88.codetaskfollower.dto.ModelUpdateDto;
 import be.jeffcheasey88.codetaskfollower.dto.ProjectDto;
 import be.jeffcheasey88.codetaskfollower.dto.StateDto;
 import be.jeffcheasey88.codetaskfollower.dto.TaskDto;
@@ -17,6 +21,7 @@ import be.jeffcheasey88.codetaskfollower.mapper.TaskMapper;
 import be.jeffcheasey88.codetaskfollower.model.Project;
 import be.jeffcheasey88.codetaskfollower.repository.ProjectRepository;
 import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
+import dev.peerat.framework.Locker;
 import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
 import dev.peerat.mapping.TreasureCache;
@@ -27,6 +32,7 @@ public class ProjectController {
 	@Injection private StateMapper stateMapper;
 	@Injection private TaskMapper taskMapper;
 	@Injection private TagMapper tagMapper;
+	@Injection("modelUpdater") private Locker<ModelUpdateDto> modelLocker;
 	
 	@Route(path = "/projects", needLogin = true)
 	public List<LightProjectDto> getProjects(){
