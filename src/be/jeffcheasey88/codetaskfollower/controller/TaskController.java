@@ -57,6 +57,8 @@ public class TaskController{
 	
 	@Route(path = "/tasks/(\\d+)", type = DELETE, needLogin = true)
 	public void deleteTask(@Argument Task task) {
+		TemporalRepository.INSTANCE.removeTaskAnyProject(task.getId());
+		TemporalRepository.INSTANCE.removeTaskAnyTag(task.getId());
 		TreasureCache.delete(task);
 	}
 	
