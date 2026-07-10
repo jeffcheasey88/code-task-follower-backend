@@ -50,7 +50,7 @@ public class Mapper implements ResponseMapper, Response, ExceptionResponse{
 		}
 	}
 	
-	private static Json toJson(Object value) throws Exception{
+	public static Json toJson(Object value) throws Exception{
 		if(value instanceof Collection){
 			return new JsonArray((Collection<Object>)value);
 		}
