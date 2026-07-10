@@ -82,8 +82,7 @@ public class ProjectController {
 	}
 	
 	@Route(path = "/projects/(\\d+)/state/(\\d+)", type = PUT, needLogin = true)
-	public void addProjectState(Matcher matcher, Project project) {
-		State state = stateRepository.findById(Integer.parseInt(matcher.group(2)));
+	public void addProjectState(@Argument Project project, @Argument(2) State state){
         TemporalRepository.INSTANCE.insertProjectStates(project, state);
         modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "update"));
 	}
@@ -94,8 +93,7 @@ public class ProjectController {
 	}
 	
 	@Route(path = "/projects/(\\d+)/state/(\\d+)", type = DELETE, needLogin = true)
-	public void removeProjectState(Matcher matcher, Project project) {
-		State state = stateRepository.findById(Integer.parseInt(matcher.group(2)));
+	public void removeProjectState(@Argument Project project, @Argument(2) State state){
         TemporalRepository.INSTANCE.removeProjectStates(project, state);
         modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "delete"));
 	}

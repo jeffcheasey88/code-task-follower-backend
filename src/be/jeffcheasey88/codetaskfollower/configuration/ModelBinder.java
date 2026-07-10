@@ -1,6 +1,5 @@
 package be.jeffcheasey88.codetaskfollower.configuration;
 
-import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -12,6 +11,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,11 +43,8 @@ public class ModelBinder implements ExecutableProvider{
 				parameter.setValue(toDto(reader.readJson(), parameter.getType()));
 			}else if(parameter.getType().getPackage().getName().endsWith("codetaskfollower.model")){
 				Repository<Object,Object> repository = (Repository<Object, Object>) this.dependencies.find(null, Class.forName("be.jeffcheasey88.codetaskfollower.repository." + parameter.getType().getSimpleName() + "Repository"), null);
-				for(Annotation annotation : parameter.getAnnotations()){
-					System.out.println(" -> "+annotation);
-				}
-				//Argument key = parameter.getAnnotation(Argument.class); //FIXME System.out.println(List.of(parameter.getAnnotations()).stream().map(a -> a.annotationType().getName()).reduce((acc, s) -> acc + s).get());
-				Object model = repository.findById(repository.parseKey(matcher.group(1))); //key.value())));
+				Argument key = parameter.getAnnotation(Argument.class);
+				Object model = repository.findById(repository.parseKey(matcher.group(key.value())));
 				if(model == null) throw new HttpError(404);
 				parameter.setValue(model);
 			}

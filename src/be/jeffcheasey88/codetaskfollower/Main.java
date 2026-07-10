@@ -109,8 +109,6 @@ public class Main{
 		}
 		System.out.println();
 		
-		System.out.println("so "+System.getenv("TERM"));
-		
 		router.listen(8001, false);
 	}
 	
