@@ -19,7 +19,7 @@ public class Configuration{
 	private boolean allowColor = true;
 	
 	private String databaseHost;
-	private int databasePort;
+	private int databasePort = 3306;
 	private String databaseName;
 	private String databaseUser;
 	private String databasePassword;
