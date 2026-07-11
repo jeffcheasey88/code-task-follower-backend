@@ -45,7 +45,7 @@ public class Main{
 	public static void main(String[] args) throws Exception{
 		final Configuration config = loadConfig(args);
 		
-		Ship ship = new Ship("mysql", new MySQLCompass("database", 3306, "code-task-follower", "root", "root"), new DatabaseConfiguration());
+		Ship ship = new Ship("mysql", new MySQLCompass(config.getDatabaseHost(), config.getDatabasePort(), config.getDatabaseName(), config.getDatabaseUser(), config.getDatabasePassword()), new DatabaseConfiguration());
 		ship.setSails();
 		TemporalRepository.INSTANCE.connector(ship); //TODO remove
 		

@@ -18,7 +18,11 @@ public class Configuration{
 	@Alias(value="color", process="booleanValue")
 	private boolean allowColor = true;
 	
-	
+	private String databaseHost;
+	private int databasePort;
+	private String databaseName;
+	private String databaseUser;
+	private String databasePassword;
 
 	public Configuration(){}
 	
@@ -26,10 +30,12 @@ public class Configuration{
 		Field field = getClass().getDeclaredField(key);
 		field.setAccessible(true);
 		Class<?> type = field.getType();
-		if(type.isPrimitive()){
-			if(type.equals(Boolean.TYPE)){
-				field.set(this, Boolean.parseBoolean(value));
-			}
+		if(type.equals(Boolean.TYPE) || type.equals(Boolean.class)){
+			field.set(this, Boolean.parseBoolean(value));
+		}else if(type.equals(Integer.TYPE) || type.equals(Integer.class)){
+			field.set(this, Integer.parseInt(value));
+		}else if(type.equals(String.class)){
+			field.set(this, value);
 		}
 	}
 	
@@ -63,6 +69,26 @@ public class Configuration{
 	
 	public boolean isColorAllow(){
 		return this.allowColor;
+	}
+	
+	public String getDatabaseHost(){
+		return this.databaseHost;
+	}
+	
+	public int getDatabasePort(){
+		return this.databasePort;
+	}
+	
+	public String getDatabaseName(){
+		return this.databaseName;
+	}
+	
+	public String getDatabaseUser(){
+		return this.databaseUser;
+	}
+	
+	public String getDatabasePassword(){
+		return this.databasePassword;
 	}
 	
 	@Repeatable(Aliases.class)
