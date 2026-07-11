@@ -37,4 +37,8 @@ public class Player{
 	public boolean getIsAdmin(){
 		return this.isAdmin;
 	}
+	
+	public void setPassword(String password){
+		this.password = password;
+	}
 }

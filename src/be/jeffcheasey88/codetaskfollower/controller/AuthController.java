@@ -1,11 +1,13 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
-import static dev.peerat.framework.RequestType.POST;
+import static dev.peerat.framework.RequestType.*;
 
 import com.password4j.Password;
 
 import be.jeffcheasey88.codetaskfollower.configuration.Authenticator.User;
+import be.jeffcheasey88.codetaskfollower.configuration.Configuration;
 import be.jeffcheasey88.codetaskfollower.dto.AuthDto;
+import be.jeffcheasey88.codetaskfollower.dto.UpdatePasswordDto;
 import be.jeffcheasey88.codetaskfollower.model.Player;
 import dev.peerat.framework.Context;
 import dev.peerat.framework.Router;
@@ -16,9 +18,14 @@ import dev.peerat.mapping.TreasureCache;
 public class AuthController{
 	
 	@Injection private Router router;
+	@Injection private Configuration config;
 	
 	@Route(path = "/users/register", type = POST)
 	public void register(Context context, AuthDto authDto) throws Exception{
+		if(!config.isRegisterAllow()){
+			context.response(400);
+			return;
+		}
 		Player player = getPlayer(authDto.username());
 		if(player != null){
 			context.response(400);
@@ -47,6 +54,16 @@ public class AuthController{
 					"Authorization: Bearer " + this.router.createAuthUser(new User(player.getId(), authDto.username())));
 		}else{
 			context.response(400);
+		}
+	}
+	
+	@Route(path = "/users/changepw", type = PATCH, needLogin = true)
+	public void changePassword(User user, UpdatePasswordDto updatePasswordDto) throws Exception{
+		Player player = getPlayer(user.getName());
+		if(Password.check(updatePasswordDto.oldPassword(), player.getPassword()).withArgon2()){
+			player.setPassword(Password.hash(updatePasswordDto.newPassword()).withArgon2().getResult());
+		}else{
+			throw new NullPointerException();
 		}
 	}
 }

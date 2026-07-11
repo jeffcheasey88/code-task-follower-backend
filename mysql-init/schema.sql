@@ -128,3 +128,10 @@ CREATE TABLE players(
 	password varchar(255) NOT NULL,
 	isAdmin boolean
 );
+
+CREATE TABLE player_permissions(
+	playerId INTEGER,
+	permissionName VARCHAR(50),
+	PRIMARY KEY (playerId, permissionName),
+    CONSTRAINT fk_player_permission FOREIGN KEY (playerId) REFERENCES players(id)
+)
