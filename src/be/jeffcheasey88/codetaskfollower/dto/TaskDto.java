@@ -3,11 +3,11 @@ package be.jeffcheasey88.codetaskfollower.dto;
 import java.util.List;
 
 public record TaskDto (
-		Integer id,
+	Integer id,
 	String name,
 	String description,
-	StateDto state,
-	List<TagDto> tags,
+	Integer stateId,
+	List<Integer> tags,
 	List<TaskDto> dependencies,
 	//ChronometerDto chronometer,
 	List<ProjectDto> projects,

@@ -13,6 +13,7 @@ import be.jeffcheasey88.codetaskfollower.dto.LightProjectDto;
 import be.jeffcheasey88.codetaskfollower.dto.ModelUpdateDto;
 import be.jeffcheasey88.codetaskfollower.dto.ProjectDto;
 import be.jeffcheasey88.codetaskfollower.dto.StateDto;
+import be.jeffcheasey88.codetaskfollower.dto.TagDto;
 import be.jeffcheasey88.codetaskfollower.dto.TaskDto;
 import be.jeffcheasey88.codetaskfollower.mapper.ProjectMapper;
 import be.jeffcheasey88.codetaskfollower.mapper.StateMapper;
@@ -20,6 +21,7 @@ import be.jeffcheasey88.codetaskfollower.mapper.TagMapper;
 import be.jeffcheasey88.codetaskfollower.mapper.TaskMapper;
 import be.jeffcheasey88.codetaskfollower.model.Project;
 import be.jeffcheasey88.codetaskfollower.model.State;
+import be.jeffcheasey88.codetaskfollower.model.Tag;
 import be.jeffcheasey88.codetaskfollower.repository.ProjectRepository;
 import be.jeffcheasey88.codetaskfollower.repository.StateRepository;
 import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
@@ -108,6 +110,11 @@ public class ProjectController {
 	}
 
 	public List<TaskDto> getTasks(int projectId){
-		return taskMapper.toDto(TemporalRepository.INSTANCE.selectTasks(projectId)).stream().map(t -> new TaskDto(t.id(), t.name(), t.description(), stateMapper.toDto(TemporalRepository.INSTANCE.selectStateForTask(t.id())), tagMapper.toDto(TemporalRepository.INSTANCE.selectTags(t.id())), null, null, null, null, null)).toList();
+		return taskMapper.toDto(TemporalRepository.INSTANCE.selectTasks(projectId)).stream().map(t -> {
+			List<Tag> tags = TemporalRepository.INSTANCE.selectTags(t.id());
+			List<Integer> tagIds = tags.stream().map(dto -> dto.getId()).toList();
+			
+			return new TaskDto(t.id(), t.name(), t.description(), stateMapper.toDto(TemporalRepository.INSTANCE.selectStateForTask(t.id())).getId(), tagIds, null, null, null, null, null);
+		}).toList();
 	}
 }
