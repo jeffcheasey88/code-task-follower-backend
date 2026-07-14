@@ -23,6 +23,7 @@ import be.jeffcheasey88.codetaskfollower.configuration.FileConfiguration;
 import be.jeffcheasey88.codetaskfollower.configuration.Mapper;
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder;
 import be.jeffcheasey88.codetaskfollower.model.Player;
+import be.jeffcheasey88.codetaskfollower.repository.ChangeSetApplier;
 import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
 import dev.peerat.framework.Locker;
 import dev.peerat.framework.RequestType;
@@ -48,6 +49,9 @@ public class Main{
 		Ship ship = new Ship("mysql", new MySQLCompass(config.getDatabaseHost(), config.getDatabasePort(), config.getDatabaseName(), config.getDatabaseUser(), config.getDatabasePassword()), new DatabaseConfiguration());
 		ship.setSails();
 		TemporalRepository.INSTANCE.connector(ship); //TODO remove
+		
+		ChangeSetApplier changeSetApplier = new ChangeSetApplier("changeset/");
+		changeSetApplier.apply();
 		
 		Router router = new Router();
 		

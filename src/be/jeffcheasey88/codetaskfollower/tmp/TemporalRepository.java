@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import dev.peerat.mapping.CursedTreasureException;
 import dev.peerat.mapping.Ship;
@@ -461,6 +462,52 @@ public class TemporalRepository{
 		}
 		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
 	}
+	
+	public void externalUpdateRequest(String sqlRequest, SqlParam... params){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement(sqlRequest);
+			if(params != null && params.length > 0){
+				for(int index = 0; index < params.length; index++){
+					SqlParam param = params[index];
+					if(param.type().equals("String")){
+						p.setString(index+1, (String) param.value());
+					}else if(param.type().equals("int")){
+						p.setInt(index+1, (int) param.value());
+					}
+				}
+			}
+			if(p.executeUpdate() >= 0) return;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
+		}
+		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	}
+	
+	public <T> List<T> externalSelectRequest(String sqlRequest, Function<ResultSet, T> mapper, SqlParam... params){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement(sqlRequest);
+			if(params != null && params.length > 0){
+				for(int index = 0; index < params.length; index++){
+					SqlParam param = params[index];
+					if(param.type().equals("String")){
+						p.setString(index+1, (String) param.value());
+					}else if(param.type().equals("int")){
+						p.setInt(index+1, (int) param.value());
+					}
+				}
+			}
+			ResultSet r = p.executeQuery();
+			List<T> l = new ArrayList<>();
+			while(r.next()) l.add(mapper.apply(r));
+			return l;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
+		}
+	}
+	
+	public static record SqlParam(String type, Object value){}
 
 	interface NewTag{
 		Tag create(int id, String name, String color);

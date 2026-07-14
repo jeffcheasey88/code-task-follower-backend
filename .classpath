@@ -6,6 +6,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="resources"/>
 	<classpathentry exported="true" kind="lib" path="peer-at-code-framework-1.2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="Treasure.jar"/>
 	<classpathentry kind="lib" path="TreasureProcessor.jar"/>
