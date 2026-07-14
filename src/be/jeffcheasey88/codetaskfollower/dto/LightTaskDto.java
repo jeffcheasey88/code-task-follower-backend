@@ -6,7 +6,7 @@ public record LightTaskDto (
 	Integer id,
 	String name,
 	String description,
-	//StateDto state,
+	Integer stateId,
 	List<TagDto> tags,
 	List<TaskDto> dependencies
 ) {}

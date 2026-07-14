@@ -33,19 +33,19 @@ public class TaskController{
 	
     @Route(path = "/tasks", needLogin = true)
 	public List<LightTaskDto> getTasks(){
-    	return taskMapper.toLightDto(taskRepository.findAll()).stream().map(taskDto -> new LightTaskDto(taskDto.id(), taskDto.name(), taskDto.description(), getTags(taskDto.id()), null)).toList();
+    	return taskMapper.toLightDto(taskRepository.findAll()).stream().map(taskDto -> new LightTaskDto(taskDto.id(), taskDto.name(), taskDto.description(), taskDto.stateId(), getTags(taskDto.id()), null)).toList();
 	}
 	
 	@Route(path = "/tasks/(\\d+)", needLogin = true)
 	public TaskDto getTask(@Argument Task task){
 		TaskDto taskDto = taskMapper.toDto(task);
-		return new TaskDto(taskDto.id(), taskDto.name(), taskDto.description(), null, getTags(taskDto.id()), null, null, null, null, null);
+		return new TaskDto(taskDto.id(), taskDto.name(), taskDto.description(), TemporalRepository.INSTANCE.selectStateForTask(taskDto.id()).getId(), getTags(taskDto.id()).stream().map(t -> t.getId()).toList(), null, null, null, null, null);
 	}
 
 	@Route(path = "/tasks", type = POST, needLogin = true)
 	public int createTask(TaskDto taskDto){
 		Task task = new Task(0, taskDto.name(), taskDto.description(), null, null, null, null, null, null);
-		TemporalRepository.INSTANCE.updateTaskState(task.getId(), taskDto.state().getId());
+		TemporalRepository.INSTANCE.updateTaskState(task.getId(), taskDto.stateId());
 		modelLocker.pushValue(new ModelUpdateDto(task, "create"));
 		return task.getId();
 	}

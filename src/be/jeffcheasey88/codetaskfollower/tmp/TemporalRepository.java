@@ -76,7 +76,7 @@ public class TemporalRepository{
 			p.setInt(1, project.getId());
 			p.setInt(2, state.getId());
 			if(project.getStates() != null){
-				project.setStates(project.getStates().stream().filter(s->s.getId() != state.getId()).toList());
+				project.setStates(project.getStates().stream().filter(s->s.getId() != s.getId()).toList());
 			}
 			if(p.executeUpdate() >= 0) return;
 		}catch(Exception e){
