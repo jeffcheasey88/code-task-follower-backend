@@ -15,14 +15,36 @@ import dev.peerat.mapping.CursedTreasureException;
 public class ChangeSetApplier{
 	
 	private String folderPath;
+	private Set<LogicalChangeSet> changes;
 	
 	public ChangeSetApplier(String folderPath){
 		this.folderPath = folderPath;
+		this.changes = new TreeSet<>((a,b) -> (a.getIndexNumber() < b.getIndexNumber()) ? 1 : (a.getIndexNumber() > b.getIndexNumber()) ? -1 : 0);
+	}
+	
+	public void addChangeSet(LogicalChangeSet changeset){
+		this.changes.add(changeset);
 	}
 	
 	public void apply() throws Exception{
-		Set<ChangeSet> changes = new TreeSet<>((a,b) -> (a.index < b.index) ? 1 : (a.index > b.index) ? -1 : 0);
+		List<ChangeSet> changes = new LinkedList<>();
 		applyDir("resources/"+folderPath, changes);
+		for(ChangeSet change : changes){
+			LogicalChangeSet logicalChangeset = null;
+			for(LogicalChangeSet changeset : this.changes){
+				if(changeset.getIndexNumber() == change.index){
+					logicalChangeset = changeset;
+					break;
+				}
+			}
+			if(logicalChangeset == null){
+				this.changes.add(LogicalChangeSet.of(change));
+			}else{
+				this.changes.remove(logicalChangeset);
+				this.changes.add(LogicalChangeSet.and(logicalChangeset, change));
+			}
+		}
+		
 		
 		List<Integer> lastIndex = null;
 		try{
@@ -49,15 +71,13 @@ public class ChangeSetApplier{
 		}
 		
 		int updatedIndex = currentIndex;
-		for(ChangeSet change : changes){
-			if(change.index <= currentIndex) continue;
-			updatedIndex = change.index;
-			String[] queries = change.query.replace("\t", "").split("\\;\\s+");
-			for(String query : queries){
-				query = query.replace("\n", "");
-				TemporalRepository.INSTANCE.externalUpdateRequest(query);
-			}
-			System.out.println("Updating to changeset "+change.index);
+		for(LogicalChangeSet change : this.changes){
+			if(change.getIndexNumber() <= currentIndex) continue;
+			updatedIndex = change.getIndexNumber();
+			change.applyBefore();
+			change.apply();
+			change.applyAfter();
+			System.out.println("Updating to changeset "+updatedIndex);
 		}
 		if(updatedIndex > currentIndex){
 			TemporalRepository.INSTANCE.externalUpdateRequest(
@@ -70,7 +90,7 @@ public class ChangeSetApplier{
 		}
 	}
 	
-	private void applyDir(String path, Set<ChangeSet> changes) throws Exception{
+	private void applyDir(String path, List<ChangeSet> changes) throws Exception{
 		BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(path)));
 		String line = reader.readLine();
 		List<String> lines = new LinkedList<>();
@@ -88,7 +108,7 @@ public class ChangeSetApplier{
 		}
 	}
 	
-	private void applyFile(String path, Set<ChangeSet> changes) throws Exception{
+	private void applyFile(String path, List<ChangeSet> changes) throws Exception{
 		BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(path)));
 		String line = reader.readLine();
 		int index = Integer.parseInt(line);
@@ -103,4 +123,60 @@ public class ChangeSetApplier{
 	}
 	
 	private record ChangeSet(int index, String query){}
+	
+	public static interface LogicalChangeSet{
+		
+		int getIndexNumber();
+		
+		void applyBefore();
+		void apply();
+		void applyAfter();
+		
+		static LogicalChangeSet of(ChangeSet changeset){
+			return new LogicalChangeSet(){
+				@Override
+				public int getIndexNumber(){
+					return changeset.index;
+				}
+				@Override
+				public void applyBefore(){}
+				@Override
+				public void apply(){
+					String[] queries = changeset.query.replace("\t", "").split("\\;\\s+");
+					for(String query : queries){
+						query = query.replace("\n", "");
+						TemporalRepository.INSTANCE.externalUpdateRequest(query);
+					}
+				}
+				@Override
+				public void applyAfter(){}
+			};
+		}
+		
+		static LogicalChangeSet and(LogicalChangeSet base, ChangeSet changeset){
+			return new LogicalChangeSet(){
+				@Override
+				public int getIndexNumber(){
+					return changeset.index;
+				}
+				@Override
+				public void applyBefore(){
+					base.applyBefore();
+				}
+				@Override
+				public void apply(){
+					base.apply();
+					String[] queries = changeset.query.replace("\t", "").split("\\;\\s+");
+					for(String query : queries){
+						query = query.replace("\n", "");
+						TemporalRepository.INSTANCE.externalUpdateRequest(query);
+					}
+				}
+				@Override
+				public void applyAfter(){
+					base.applyAfter();
+				}
+			};
+		}
+	}
 }

@@ -51,7 +51,6 @@ public class Main{
 		TemporalRepository.INSTANCE.connector(ship); //TODO remove
 		
 		ChangeSetApplier changeSetApplier = new ChangeSetApplier("changeset/");
-		changeSetApplier.apply();
 		
 		Router router = new Router();
 		
@@ -62,9 +61,11 @@ public class Main{
 		router.setDefaultResponse((matcher, context, reader, writer) -> context.response(context.getType().equals(OPTIONS) ? 200 : 404));
 		
 		DependencyInjector injector = new DependencyInjector()
-				.of(router, config)
+				.of(router, config, changeSetApplier)
 				.of(Locker.class, Locker::new)
 				.ofServices();
+		
+		changeSetApplier.apply();
 		
 		Mapper mapper = new Mapper();
 		router.setMapper(mapper);

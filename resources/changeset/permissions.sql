@@ -15,12 +15,6 @@ CREATE TABLE PlayerGroup(
     CONSTRAINT fk_playergroup_group FOREIGN KEY (groupId) REFERENCES playerGroups(id)
 );
 
-CREATE TABLE InheritAccess(
-	entityId INTEGER,
-	inheritLevel VARCHAR(20),
-	PRIMARY KEY (entityId, inheritLevel)
-);
-
 CREATE TABLE ProjectAccess(
 	roleType VARCHAR(10),
 	roleId INTEGER,
@@ -56,3 +50,35 @@ CREATE TABLE TagAccess(
 	PRIMARY KEY (tagId, roleId, roleType),
 	CONSTRAINT fk_tagaccess_tag FOREIGN KEY (tagId) REFERENCES tags(id)
 );
+
+CREATE VIEW ProjectAccessView AS 
+SELECT pa.roleId as playerId, pa.projectId, pa.accessLevel 
+FROM ProjectAccess pa 
+WHERE pa.roleType = 'player' 
+
+UNION ALL 
+
+SELECT pg.playerId as playerId, pa.projectId, pa.accessLevel 
+FROM ProjectAccess pa 
+JOIN PlayerGroup pg ON pg.groupId = pa.roleId 
+WHERE pa.roleType = 'group'
+;
+
+CREATE VIEW TaskAccessView AS 
+SELECT ta.roleId as playerId, ta.taskId, ta.accessLevel, 'task' as entityLevel 
+FROM TaskAccess ta 
+WHERE ta.roleType = 'player' 
+
+UNION ALL 
+
+SELECT pg.playerId as playerId, ta.taskId, ta.accessLevel, 'task' as entityLevel 
+FROM TaskAccess ta 
+JOIN PlayerGroup pg ON pg.groupId = ta.roleId 
+WHERE ta.roleType = 'group'
+
+UNION ALL 
+
+SELECT pav.playerId, tp.taskId, pav.accessLevel, 'project' as entityLevel 
+FROM ProjectAccessView pav 
+JOIN TaskProject tp ON tp.projectId = pav.projectId
+;

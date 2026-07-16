@@ -7,8 +7,14 @@ import java.util.function.Predicate;
 import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository.SqlParam;
 
 public class Permission{
+	
+	public static int PERM_READ = 0;
+	public static int PERM_ADD = 1;
+	public static int PERM_UPDATE = 2;
+	public static int PERM_DELETE = 4;
+	public static int PERM_ADMIN = 8;
 
-	private static void giveAccess(String entityType, int entityId, String roleType, int roleId, int accessLevel){
+	public static void giveAccess(String entityType, int entityId, String roleType, int roleId, int accessLevel){
 		TemporalRepository.INSTANCE.externalUpdateRequest(
 				"INSERT INTO "+entityType+"Access (roleType,roleId,"+entityType.toLowerCase()+"Id, accessLevel) VALUES (?,?,?,?)",
 				new SqlParam("String",roleType),
@@ -32,9 +38,9 @@ public class Permission{
 				);
 	}
 	
-	public static boolean canAccess(int playerId, String entityType, int entityId, Predicate<Integer> validator){
+	public static boolean canAccessProject(int playerId, int projectId, Predicate<Integer> validator){
 		List<Integer> results = TemporalRepository.INSTANCE.externalSelectRequest(
-				"SELECT accessLevel FROM "+entityType+"Access WHERE roleType = 'player' AND roleId = ? AND "+entityType.toLowerCase()+"Id = ?",
+				"SELECT accessLevel FROM ProjectAccessView WHERE playerId = ? AND projectId = ?",
 				(r) -> {
 					try {
 						return r.getInt("accessLevel");
@@ -43,23 +49,38 @@ public class Permission{
 					}
 				},
 				new SqlParam("int",playerId),
-				new SqlParam("int",entityId));
-		if((!results.isEmpty()) && validator.test(results.get(0))) return true; 
+				new SqlParam("int",projectId));
+		return ((!results.isEmpty()) && validator.test(results.get(0)));
+	}
+	
+	public static boolean canAccessTask(int playerId, int taskId, Predicate<Integer> taskValidator, Predicate<Integer> projectValidator){
+		List<TreasureAccess> results = TemporalRepository.INSTANCE.externalSelectRequest(
+				"SELECT accessLevel, entityLevel FROM TaskAccessView WHERE playerId = ? AND taskId = ?",
+				(r) -> {
+					try {
+						return new TreasureAccess(r.getInt("accessLevel"), r.getString("entityLevel"));
+					} catch (SQLException e){
+						throw new RuntimeException("??");
+					}
+				},
+				new SqlParam("int",playerId),
+				new SqlParam("int",taskId));
+		if(results.isEmpty()) return false;
 		
-		results = TemporalRepository.INSTANCE.externalSelectRequest(
-				"SELECT a.accessLevel FROM "+entityType+"Access a JOIN PlayerGroup pg ON pg.groupId = a.roleId JOIN players p ON p.id = pg.playerId WHERE a.roleType = 'group' AND p.id = ? AND a."+entityType.toLowerCase()+"Id = ?",
-				(r) -> {
-					try {
-						return r.getInt("accessLevel");
-					} catch (SQLException e){
-						throw new RuntimeException("??");
-					}
-				},
-				new SqlParam("int",playerId),
-				new SqlParam("int",entityId));
-		if((!results.isEmpty()) && validator.test(results.get(0))) return true;
+		for(TreasureAccess access : results){
+			if(access.entityLevel.equals("task")){
+				if(taskValidator.test(access.accessLevel)) return true;
+			}
+		}
+		
+		for(TreasureAccess access : results){
+			if(access.entityLevel.equals("project")){
+				if(projectValidator.test(access.accessLevel)) return true;
+			}
+		}
 		
 		return false;
 	}
 	
+	private record TreasureAccess(int accessLevel, String entityLevel){}
 }

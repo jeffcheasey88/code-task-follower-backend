@@ -8,6 +8,7 @@ import static dev.peerat.framework.RequestType.PUT;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import be.jeffcheasey88.codetaskfollower.configuration.Authenticator.User;
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Argument;
 import be.jeffcheasey88.codetaskfollower.dto.LightTaskDto;
 import be.jeffcheasey88.codetaskfollower.dto.ModelUpdateDto;
@@ -18,6 +19,7 @@ import be.jeffcheasey88.codetaskfollower.mapper.TaskMapper;
 import be.jeffcheasey88.codetaskfollower.model.Tag;
 import be.jeffcheasey88.codetaskfollower.model.Task;
 import be.jeffcheasey88.codetaskfollower.repository.TaskRepository;
+import be.jeffcheasey88.codetaskfollower.tmp.Permission;
 import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
 import dev.peerat.framework.Locker;
 import dev.peerat.framework.dependency.Injection;
@@ -43,8 +45,9 @@ public class TaskController{
 	}
 
 	@Route(path = "/tasks", type = POST, needLogin = true)
-	public int createTask(TaskDto taskDto){
+	public int createTask(User user, TaskDto taskDto){
 		Task task = new Task(0, taskDto.name(), taskDto.description(), null, null, null, null, null, null);
+		Permission.giveAccess("Task", task.getId(), "player", user.getId(), Permission.PERM_ADMIN);
 		TemporalRepository.INSTANCE.updateTaskState(task.getId(), taskDto.stateId());
 		modelLocker.pushValue(new ModelUpdateDto(task, "create"));
 		return task.getId();
