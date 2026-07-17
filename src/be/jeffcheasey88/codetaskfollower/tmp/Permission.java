@@ -51,7 +51,7 @@ public class Permission{
 					try {
 						return r.getInt("accessLevel");
 					} catch (SQLException e){
-						throw new RuntimeException("??");
+						throw new RuntimeException("??", e);
 					}
 				},
 				new SqlParam("int",playerId),
@@ -66,7 +66,7 @@ public class Permission{
 					try {
 						return new TreasureAccess(r.getInt("accessLevel"), r.getString("entityLevel"));
 					} catch (SQLException e){
-						throw new RuntimeException("??");
+						throw new RuntimeException("??", e);
 					}
 				},
 				new SqlParam("int",playerId),
@@ -89,6 +89,66 @@ public class Permission{
 		
 		return false;
 	}
+	
+	public static List<EnityPermission> getEntityPermissions(String roleType, int roleId){
+		return TemporalRepository.INSTANCE.externalSelectRequest(
+				"SELECT * FROM EntityPermissionView WHERE roleType = ? AND roleId = ?",
+				(row) -> {
+					try {
+						return new EnityPermission(
+								row.getString("roleType"),
+								row.getInt("roleId"),
+								row.getInt("entityId"),
+								row.getInt("accessLevel"),
+								row.getString("entityType"));
+					} catch (SQLException e) {
+						throw new RuntimeException("??", e);
+					}
+				},
+				new SqlParam("String", roleType),
+				new SqlParam("int", roleId)
+				);
+	}
+	
+	public static List<EnityPermission> getEntityPermissions(String roleType, String entityType, int entityId){
+		return TemporalRepository.INSTANCE.externalSelectRequest(
+				"SELECT * FROM EntityPermissionView WHERE roleType = ? AND entityId = ? AND entityType = ?",
+				(row) -> {
+					try {
+						return new EnityPermission(
+								row.getString("roleType"),
+								row.getInt("roleId"),
+								row.getInt("entityId"),
+								row.getInt("accessLevel"),
+								row.getString("entityType"));
+					} catch (SQLException e) {
+						throw new RuntimeException("??", e);
+					}
+				},
+				new SqlParam("String", roleType),
+				new SqlParam("int", entityId),
+				new SqlParam("String", entityType)
+				);
+	}
+	
+	public static int getAccess(String roleType, int roleId, String entityType, int entityId){
+		List<Integer> results = TemporalRepository.INSTANCE.externalSelectRequest(
+				"SELECT accessLevel FROM "+entityType+"Access WHERE roleId = ? AND roleType = ? AND "+entityType.toLowerCase()+"Id = ?",
+				(r) -> {
+					try {
+						return r.getInt("accessLevel");
+					} catch (SQLException e){
+						throw new RuntimeException("??", e);
+					}
+				},
+				new SqlParam("int", roleId),
+				new SqlParam("String", roleType),
+				new SqlParam("int",entityId));
+		if(results.isEmpty()) return -1;
+		return results.get(0);
+	}
+	
+	public record EnityPermission(String roleType, int roleId, int entityId, int accessLevel, String entityType){}
 	
 	private record TreasureAccess(int accessLevel, String entityLevel){}
 }

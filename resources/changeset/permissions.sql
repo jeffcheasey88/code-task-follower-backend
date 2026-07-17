@@ -82,3 +82,27 @@ SELECT pav.playerId, tp.taskId, pav.accessLevel, 'project' as entityLevel
 FROM ProjectAccessView pav 
 JOIN TaskProject tp ON tp.projectId = pav.projectId
 ;
+
+CREATE VIEW EntityPermissionView AS 
+SELECT pa.roleType as roleType, pa.roleId as roleId, pa.projectId as entityId, pa.accessLevel as accessLevel, 'project' as entityType 
+FROM ProjectAccess pa 
+
+UNION ALL 
+
+SELECT 'player' as roleType, pg.playerId as roleId, pa.projectId as entityId, pa.accessLevel as accessLevel, 'project' as entityType 
+FROM ProjectAccess pa 
+JOIN PlayerGroup pg ON pg.groupId = pa.roleId 
+WHERE pa.roleType = 'group' 
+
+UNION ALL 
+
+SELECT ta.roleType as roleType, ta.roleId as roleId, ta.taskId as entityId, ta.accessLevel as accessLevel, 'task' as entityType 
+FROM TaskAccess ta 
+
+UNION ALL
+
+SELECT 'player' as roleType, pg.playerId as roleId, ta.taskId as entityId, ta.accessLevel as accessLevel, 'task' as entityType 
+FROM TaskAccess ta 
+JOIN PlayerGroup pg ON pg.groupId = ta.roleId 
+WHERE ta.roleType = 'group' 
+;

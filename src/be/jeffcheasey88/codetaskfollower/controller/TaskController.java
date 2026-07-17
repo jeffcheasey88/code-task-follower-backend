@@ -154,4 +154,11 @@ public class TaskController{
 				}
 			);
 	}
+	
+	public static boolean canAdminTask(User user, int taskId){
+		return user.isAdmin() || Permission.canAccessTask(user.getId(), taskId,
+				access -> canAccess(access, Permission.PERM_ADMIN),
+				(access, override)-> canAccess(access, Permission.PERM_ADMIN)
+			);
+	}
 }

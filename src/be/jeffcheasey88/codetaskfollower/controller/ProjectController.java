@@ -154,4 +154,8 @@ public class ProjectController {
 		return user.isAdmin() || Permission.canAccessProject(user.getId(), projectId, access -> canAccess(access, Permission.PERM_DELETE) || canAccess(access, Permission.PERM_ADMIN));
 	}
 	
+	public static boolean canAdminProject(User user, int projectId){
+		return user.isAdmin() || Permission.canAccessProject(user.getId(), projectId, access -> canAccess(access, Permission.PERM_ADMIN));
+	}
+	
 }
