@@ -2,6 +2,7 @@ package be.jeffcheasey88.codetaskfollower.tmp;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository.SqlParam;
@@ -13,6 +14,11 @@ public class Permission{
 	public static int PERM_UPDATE = 2;
 	public static int PERM_DELETE = 4;
 	public static int PERM_ADMIN = 8;
+	
+	public static boolean canAccess(int access, int perm){
+		int filter = access&perm;
+		return filter != 0;
+	}
 
 	public static void giveAccess(String entityType, int entityId, String roleType, int roleId, int accessLevel){
 		TemporalRepository.INSTANCE.externalUpdateRequest(
@@ -53,7 +59,7 @@ public class Permission{
 		return ((!results.isEmpty()) && validator.test(results.get(0)));
 	}
 	
-	public static boolean canAccessTask(int playerId, int taskId, Predicate<Integer> taskValidator, Predicate<Integer> projectValidator){
+	public static boolean canAccessTask(int playerId, int taskId, Predicate<Integer> taskValidator, BiPredicate<Integer, Boolean	> projectValidator){
 		List<TreasureAccess> results = TemporalRepository.INSTANCE.externalSelectRequest(
 				"SELECT accessLevel, entityLevel FROM TaskAccessView WHERE playerId = ? AND taskId = ?",
 				(r) -> {
@@ -67,15 +73,17 @@ public class Permission{
 				new SqlParam("int",taskId));
 		if(results.isEmpty()) return false;
 		
+		boolean hasTaskPermission = false;
 		for(TreasureAccess access : results){
 			if(access.entityLevel.equals("task")){
 				if(taskValidator.test(access.accessLevel)) return true;
+				hasTaskPermission = true;
 			}
 		}
 		
 		for(TreasureAccess access : results){
 			if(access.entityLevel.equals("project")){
-				if(projectValidator.test(access.accessLevel)) return true;
+				if(projectValidator.test(access.accessLevel, hasTaskPermission)) return true;
 			}
 		}
 		

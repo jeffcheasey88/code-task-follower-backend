@@ -1,5 +1,7 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
+import static be.jeffcheasey88.codetaskfollower.tmp.Permission.*;
+
 import static dev.peerat.framework.RequestType.DELETE;
 import static dev.peerat.framework.RequestType.PATCH;
 import static dev.peerat.framework.RequestType.POST;
@@ -46,14 +48,14 @@ public class ProjectController {
 		return projectMapper.toLightDto(
 				projectRepository.findAll()
 				.stream()
-				.filter(project -> canReadproject(user, project.getId()))
+				.filter(project -> canReadProject(user, project.getId()))
 				.toList()
 			);
 	}
 	
 	@Route(path = "/projects/(\\d+)", needLogin = true)
 	public ProjectDto getProject(User user, @Argument Project project){
-		if(!canReadproject(user,  project.getId())) throw new HttpError(403);
+		if(!canReadProject(user,  project.getId())) throw new HttpError(403);
 		ProjectDto projectDto = projectMapper.toDto(project);
 		ProjectDto p = new ProjectDto(projectDto.id(), projectDto.name(), projectDto.color(), projectDto.description(), getStates(projectDto.id()), getTasks(projectDto.id()));
 		return p;
@@ -119,7 +121,7 @@ public class ProjectController {
 	@Route(path = "/projects/(\\d+)/states", needLogin = true)
 	public List<StateDto> getStates(User user, Matcher matcher){
 		int projectId = Integer.parseInt(matcher.group(1));
-		if(!canReadproject(user, projectId)) throw new HttpError(403);
+		if(!canReadProject(user, projectId)) throw new HttpError(403);
 		return getStates(projectId);
 	}
 	
@@ -136,7 +138,7 @@ public class ProjectController {
 		}).toList();
 	}
 	
-	private boolean canReadproject(User user, int projectId){
+	private boolean canReadProject(User user, int projectId){
 		return user.isAdmin() || Permission.canAccessProject(user.getId(), projectId, i->true);
 	}
 	
@@ -152,8 +154,4 @@ public class ProjectController {
 		return user.isAdmin() || Permission.canAccessProject(user.getId(), projectId, access -> canAccess(access, Permission.PERM_DELETE) || canAccess(access, Permission.PERM_ADMIN));
 	}
 	
-	private boolean canAccess(int access, int perm){
-		int filter = access&perm;
-		return filter != 0;
-	}
 }

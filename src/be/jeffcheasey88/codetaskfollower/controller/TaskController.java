@@ -1,5 +1,6 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
+import static be.jeffcheasey88.codetaskfollower.tmp.Permission.canAccess;
 import static dev.peerat.framework.RequestType.DELETE;
 import static dev.peerat.framework.RequestType.PATCH;
 import static dev.peerat.framework.RequestType.POST;
@@ -14,6 +15,7 @@ import be.jeffcheasey88.codetaskfollower.dto.LightTaskDto;
 import be.jeffcheasey88.codetaskfollower.dto.ModelUpdateDto;
 import be.jeffcheasey88.codetaskfollower.dto.TagDto;
 import be.jeffcheasey88.codetaskfollower.dto.TaskDto;
+import be.jeffcheasey88.codetaskfollower.exception.HttpError;
 import be.jeffcheasey88.codetaskfollower.mapper.TagMapper;
 import be.jeffcheasey88.codetaskfollower.mapper.TaskMapper;
 import be.jeffcheasey88.codetaskfollower.model.Tag;
@@ -34,12 +36,18 @@ public class TaskController{
 	@Injection("modelUpdater") private Locker<ModelUpdateDto> modelLocker;
 	
     @Route(path = "/tasks", needLogin = true)
-	public List<LightTaskDto> getTasks(){
-    	return taskMapper.toLightDto(taskRepository.findAll()).stream().map(taskDto -> new LightTaskDto(taskDto.id(), taskDto.name(), taskDto.description(), taskDto.stateId(), getTags(taskDto.id()), null)).toList();
+	public List<LightTaskDto> getTasks(User user){
+    	return taskRepository.findAll()
+    			.stream()
+    			.filter(task -> canReadTask(user, task.getId()))
+    			.map(taskMapper::toLightDto)
+    			.map(taskDto -> new LightTaskDto(taskDto.id(), taskDto.name(), taskDto.description(), taskDto.stateId(), getTags(taskDto.id()), null))
+    			.toList();
 	}
 	
 	@Route(path = "/tasks/(\\d+)", needLogin = true)
-	public TaskDto getTask(@Argument Task task){
+	public TaskDto getTask(User user, @Argument Task task){
+		if(!canReadTask(user, task.getId())) throw new HttpError(403);
 		TaskDto taskDto = taskMapper.toDto(task);
 		return new TaskDto(taskDto.id(), taskDto.name(), taskDto.description(), TemporalRepository.INSTANCE.selectStateForTask(taskDto.id()).getId(), getTags(taskDto.id()).stream().map(t -> t.getId()).toList(), null, null, null, null, null);
 	}
@@ -54,21 +62,24 @@ public class TaskController{
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = PUT, needLogin = true)
-	public void editTask(TaskDto taskDto, @Argument Task task) {
+	public void editTask(User user, TaskDto taskDto, @Argument Task task){
+		if(!canUpdateTask(user, task.getId())) throw new HttpError(403);
         taskMapper.fullCopyDtoToModel(taskDto, task);
         TemporalRepository.INSTANCE.updateTask(task);
         modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "update"));
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = PATCH, needLogin = true)
-	public void editPartialTask(TaskDto taskDto, @Argument Task task) {	
+	public void editPartialTask(User user, TaskDto taskDto, @Argument Task task){
+		if(!canUpdateTask(user, task.getId())) throw new HttpError(403);
 		taskMapper.safeCopyDtoToModel(taskDto, task);
 		TemporalRepository.INSTANCE.updateTask(task);
 		modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "update"));
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = DELETE, needLogin = true)
-	public void deleteTask(@Argument Task task) {
+	public void deleteTask(User user, @Argument Task task) {
+		if(!canDeleteTask(user, task.getId())) throw new HttpError(403);
 		TemporalRepository.INSTANCE.removeTaskAnyProject(task.getId());
 		TemporalRepository.INSTANCE.removeTaskAnyTag(task.getId());
 		TreasureCache.delete(task);
@@ -76,20 +87,24 @@ public class TaskController{
 	}
 	
 	@Route(path = "/tasks/(\\d+)/tag/(\\d+)", type = PUT, needLogin = true)
-	public void addTaskTag(@Argument Task task, @Argument(2) Tag tag){
+	public void addTaskTag(User user, @Argument Task task, @Argument(2) Tag tag){
+		if(!canAddElementTask(user, task.getId())) throw new HttpError(403);
         TemporalRepository.INSTANCE.insertTaskTag(task, tag);
         modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "update"));
 	}
 	
 	@Route(path = "/tasks/(\\d+)/tag/(\\d+)", type = DELETE, needLogin = true)
-	public void removeTaskTag(@Argument Task task, @Argument(2) Tag tag){
+	public void removeTaskTag(User user, @Argument Task task, @Argument(2) Tag tag){
+		if(!canAddElementTask(user, task.getId())) throw new HttpError(403);
         TemporalRepository.INSTANCE.removeTaskTag(task, tag);
         modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "update"));
 	}
 	
 	@Route(path = "/tasks/(\\d+)/tags", needLogin = true)
-	public List<TagDto> getTags(Matcher matcher){
-		return getTags(Integer.parseInt(matcher.group(1)));
+	public List<TagDto> getTags(User user, Matcher matcher){
+		int taskId = Integer.parseInt(matcher.group(1));
+		if(!canReadTask(user, taskId)) throw new HttpError(403);
+		return getTags(taskId);
 	}
 	
 	public List<TagDto> getTags(int taskId){
@@ -97,8 +112,46 @@ public class TaskController{
 	}
 	
 	@Route(path = "/tasks/(\\d+)/state/(\\d+)", type = PUT, needLogin = true)
-	public void updateTaskState(Matcher matcher){
-        TemporalRepository.INSTANCE.updateTaskState(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
+	public void updateTaskState(User user, Matcher matcher){
+		int taskId = Integer.parseInt(matcher.group(1));
+		if(!canUpdateTask(user, taskId)) throw new HttpError(403);
+        TemporalRepository.INSTANCE.updateTaskState(taskId, Integer.parseInt(matcher.group(2)));
 	}
 	
+	private boolean canReadTask(User user, int taskId){
+		return user.isAdmin() || Permission.canAccessTask(user.getId(), taskId,
+				access -> true,
+				(access, override)-> true
+			);
+	}
+	
+	private boolean canAddElementTask(User user, int taskId){
+		return user.isAdmin() || Permission.canAccessTask(user.getId(), taskId,
+				access -> canAccess(access, Permission.PERM_ADD) || canAccess(access, Permission.PERM_ADMIN),
+				(access, override)-> {
+					if(override) return canAccess(access, Permission.PERM_ADMIN);
+					return canAccess(access, Permission.PERM_ADD) || canAccess(access, Permission.PERM_ADMIN);
+				}
+			);
+	}
+	
+	private boolean canUpdateTask(User user, int taskId){
+		return user.isAdmin() || Permission.canAccessTask(user.getId(), taskId,
+				access -> canAccess(access, Permission.PERM_UPDATE) || canAccess(access, Permission.PERM_ADMIN),
+				(access, override)-> {
+					if(override) return canAccess(access, Permission.PERM_ADMIN);
+					return canAccess(access, Permission.PERM_UPDATE) || canAccess(access, Permission.PERM_ADMIN);
+				}
+			);
+	}
+	
+	private boolean canDeleteTask(User user, int taskId){
+		return user.isAdmin() || Permission.canAccessTask(user.getId(), taskId,
+				access -> canAccess(access, Permission.PERM_DELETE) || canAccess(access, Permission.PERM_ADMIN),
+				(access, override)-> {
+					if(override) return canAccess(access, Permission.PERM_ADMIN);
+					return canAccess(access, Permission.PERM_DELETE) || canAccess(access, Permission.PERM_ADMIN);
+				}
+			);
+	}
 }
