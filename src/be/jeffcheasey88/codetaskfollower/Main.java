@@ -22,6 +22,7 @@ import be.jeffcheasey88.codetaskfollower.configuration.DatabaseConfiguration;
 import be.jeffcheasey88.codetaskfollower.configuration.FileConfiguration;
 import be.jeffcheasey88.codetaskfollower.configuration.Mapper;
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder;
+import be.jeffcheasey88.codetaskfollower.exception.HttpError;
 import be.jeffcheasey88.codetaskfollower.model.Player;
 import be.jeffcheasey88.codetaskfollower.repository.ChangeSetApplier;
 import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
@@ -105,6 +106,7 @@ public class Main{
 				System.err.println("erreur d'authentification");
 				return;
 			}
+			if(throwable instanceof HttpError) return;
 			throwable.printStackTrace();
 		}, Throwable::printStackTrace)).start();
 		

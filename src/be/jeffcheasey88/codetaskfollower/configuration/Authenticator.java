@@ -29,16 +29,19 @@ public class Authenticator extends JwtAuthenticator{
 	public static class User extends dev.peerat.framework.auth.User{
 		
 		private int id;
+		private boolean isAdmin;
 		private String name;
 		
 		public User(JwtClaims claims) throws MalformedClaimException{
 			this.id = ((Number)claims.getClaimValue("id")).intValue();
+			this.isAdmin = ((Boolean)claims.getClaimValue("admin")).booleanValue();
 			this.name = claims.getStringClaimValue("name");
 		}
 		
-		public User(int id, String name){
+		public User(int id, String name, boolean isAdmin){
 			this.id = id;
 			this.name = name;
+			this.isAdmin = isAdmin;
 		}
 		
 		public int getId(){
@@ -49,9 +52,14 @@ public class Authenticator extends JwtAuthenticator{
 			return this.name;
 		}
 		
+		public boolean isAdmin(){
+			return this.isAdmin;
+		}
+		
 		public void write(JwtClaims claims){
 			claims.setClaim("id", id);
 			claims.setStringClaim("name", name);
+			claims.setClaim("admin", isAdmin);
 		}
 	}
 }

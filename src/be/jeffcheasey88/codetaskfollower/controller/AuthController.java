@@ -34,7 +34,7 @@ public class AuthController{
 		player = new Player(0, authDto.username(), Password.hash(authDto.password()).withArgon2().getResult(), false);
 		context.response(200,
 				"Access-Control-Expose-Headers: Authorization",
-				"Authorization: Bearer " + this.router.createAuthUser(new User(player.getId(), authDto.username())));
+				"Authorization: Bearer " + this.router.createAuthUser(new User(player.getId(), authDto.username(), player.getIsAdmin())));
 	}
 	
 	private Player getPlayer(String username){
@@ -51,7 +51,7 @@ public class AuthController{
 		if(Password.check(authDto.password(), player.getPassword()).withArgon2()){
 			context.response(200,
 					"Access-Control-Expose-Headers: Authorization",
-					"Authorization: Bearer " + this.router.createAuthUser(new User(player.getId(), authDto.username())));
+					"Authorization: Bearer " + this.router.createAuthUser(new User(player.getId(), authDto.username(), player.getIsAdmin())));
 		}else{
 			context.response(400);
 		}

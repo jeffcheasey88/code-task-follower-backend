@@ -46,14 +46,14 @@ public class ProjectController {
 		return projectMapper.toLightDto(
 				projectRepository.findAll()
 				.stream()
-				.filter(project -> Permission.canAccessProject(user.getId(), project.getId(), i->true))
+				.filter(project -> canReadproject(user, project.getId()))
 				.toList()
 			);
 	}
 	
 	@Route(path = "/projects/(\\d+)", needLogin = true)
 	public ProjectDto getProject(User user, @Argument Project project){
-		if(!Permission.canAccessProject(user.getId(), project.getId(), i->true)) throw new HttpError(403);
+		if(!canReadproject(user,  project.getId())) throw new HttpError(403);
 		ProjectDto projectDto = projectMapper.toDto(project);
 		ProjectDto p = new ProjectDto(projectDto.id(), projectDto.name(), projectDto.color(), projectDto.description(), getStates(projectDto.id()), getTasks(projectDto.id()));
 		return p;
@@ -70,7 +70,7 @@ public class ProjectController {
 	
 	@Route(path = "/projects/(\\d+)", type = PUT, needLogin = true)
 	public void editProject(User user, @Argument Project project, ProjectDto projectDto){
-		if(!Permission.canAccessProject(user.getId(), project.getId(), i->i%Permission.PERM_UPDATE != 0 || i%Permission.PERM_ADMIN!= 0)) throw new HttpError(403);
+		if(!canUpdateProject(user, project.getId()))  throw new HttpError(403);
 		project.setName(projectDto.name());
 		project.setColor(projectDto.color());
 		project.setDescription(projectDto.description());
@@ -80,7 +80,7 @@ public class ProjectController {
 	
 	@Route(path = "/projects/(\\d+)", type = PATCH, needLogin = true)
 	public void editPartialProject(User user, @Argument Project project, ProjectDto projectDto) {
-		if(!Permission.canAccessProject(user.getId(), project.getId(), i->i%Permission.PERM_UPDATE != 0 || i%Permission.PERM_ADMIN!= 0)) throw new HttpError(403);
+		if(!canUpdateProject(user, project.getId()))  throw new HttpError(403);
 		if(projectDto.name() != null) project.setName(projectDto.name());
 		if(projectDto.color() != null) project.setColor(projectDto.color());
 		if(projectDto.description() != null) project.setDescription(projectDto.description());
@@ -90,14 +90,14 @@ public class ProjectController {
 	
 	@Route(path = "/projects/(\\d+)", type = DELETE, needLogin = true)
 	public void deleteProject(User user, @Argument Project project){
-		if(!Permission.canAccessProject(user.getId(), project.getId(), i->i%Permission.PERM_DELETE != 0 || i%Permission.PERM_ADMIN!= 0)) throw new HttpError(403);
+		if(!canDeleteProject(user, project.getId()))  throw new HttpError(403);
 		TreasureCache.delete(project);
 		modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "delete"));
 	}
 	
 	@Route(path = "/projects/(\\d+)/state/(\\d+)", type = PUT, needLogin = true)
 	public void addProjectState(User user, @Argument Project project, @Argument(2) State state){
-		if(!Permission.canAccessProject(user.getId(), project.getId(), i->i%Permission.PERM_UPDATE != 0 || i%Permission.PERM_ADMIN!= 0)) throw new HttpError(403);
+		if(!canUpdateProject(user, project.getId()))  throw new HttpError(403);
         TemporalRepository.INSTANCE.insertProjectStates(project, state);
         modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "update"));
 	}
@@ -105,13 +105,13 @@ public class ProjectController {
 	@Route(path = "/projects/(\\d+)/task/(\\d+)", type = PUT, needLogin = true)
 	public void addProjectTask(User user, Matcher matcher){
 		int projectId = Integer.parseInt(matcher.group(1));
-		if(!Permission.canAccessProject(user.getId(), projectId, i->i%Permission.PERM_ADD != 0 || i%Permission.PERM_ADMIN!= 0)) throw new HttpError(403);
+		if(!canAddElementProject(user, projectId))  throw new HttpError(403);
         TemporalRepository.INSTANCE.insertProjectTasks(projectId, Integer.parseInt(matcher.group(2)));
 	}
 	
 	@Route(path = "/projects/(\\d+)/state/(\\d+)", type = DELETE, needLogin = true)
 	public void removeProjectState(User user, @Argument Project project, @Argument(2) State state){
-		if(!Permission.canAccessProject(user.getId(), project.getId(), i->i%Permission.PERM_UPDATE != 0 || i%Permission.PERM_ADMIN!= 0)) throw new HttpError(403);
+		if(!canUpdateProject(user, project.getId()))  throw new HttpError(403);
         TemporalRepository.INSTANCE.removeProjectStates(project, state);
         modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "delete"));
 	}
@@ -119,7 +119,7 @@ public class ProjectController {
 	@Route(path = "/projects/(\\d+)/states", needLogin = true)
 	public List<StateDto> getStates(User user, Matcher matcher){
 		int projectId = Integer.parseInt(matcher.group(1));
-		if(!Permission.canAccessProject(user.getId(), projectId, i->true)) throw new HttpError(403);
+		if(!canReadproject(user, projectId)) throw new HttpError(403);
 		return getStates(projectId);
 	}
 	
@@ -134,5 +134,26 @@ public class ProjectController {
 			
 			return new TaskDto(t.id(), t.name(), t.description(), stateMapper.toDto(TemporalRepository.INSTANCE.selectStateForTask(t.id())).getId(), tagIds, null, null, null, null, null);
 		}).toList();
+	}
+	
+	private boolean canReadproject(User user, int projectId){
+		return user.isAdmin() || Permission.canAccessProject(user.getId(), projectId, i->true);
+	}
+	
+	private boolean canAddElementProject(User user, int projectId){
+		return user.isAdmin() || Permission.canAccessProject(user.getId(), projectId, access -> canAccess(access, Permission.PERM_ADD) || canAccess(access, Permission.PERM_ADMIN));
+	}
+	
+	private boolean canUpdateProject(User user, int projectId){
+		return user.isAdmin() || Permission.canAccessProject(user.getId(), projectId, access -> canAccess(access, Permission.PERM_UPDATE) || canAccess(access, Permission.PERM_ADMIN));
+	}
+	
+	private boolean canDeleteProject(User user, int projectId){
+		return user.isAdmin() || Permission.canAccessProject(user.getId(), projectId, access -> canAccess(access, Permission.PERM_DELETE) || canAccess(access, Permission.PERM_ADMIN));
+	}
+	
+	private boolean canAccess(int access, int perm){
+		int filter = access&perm;
+		return filter != 0;
 	}
 }
