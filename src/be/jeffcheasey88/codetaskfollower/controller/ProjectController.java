@@ -138,19 +138,19 @@ public class ProjectController {
 		}).toList();
 	}
 	
-	private boolean canReadProject(User user, int projectId){
+	public static boolean canReadProject(User user, int projectId){
 		return user.isAdmin() || Permission.canAccessProject(user.getId(), projectId, i->true);
 	}
 	
-	private boolean canAddElementProject(User user, int projectId){
+	public static boolean canAddElementProject(User user, int projectId){
 		return user.isAdmin() || Permission.canAccessProject(user.getId(), projectId, access -> canAccess(access, Permission.PERM_ADD) || canAccess(access, Permission.PERM_ADMIN));
 	}
 	
-	private boolean canUpdateProject(User user, int projectId){
+	public static boolean canUpdateProject(User user, int projectId){
 		return user.isAdmin() || Permission.canAccessProject(user.getId(), projectId, access -> canAccess(access, Permission.PERM_UPDATE) || canAccess(access, Permission.PERM_ADMIN));
 	}
 	
-	private boolean canDeleteProject(User user, int projectId){
+	public static boolean canDeleteProject(User user, int projectId){
 		return user.isAdmin() || Permission.canAccessProject(user.getId(), projectId, access -> canAccess(access, Permission.PERM_DELETE) || canAccess(access, Permission.PERM_ADMIN));
 	}
 	

@@ -118,14 +118,14 @@ public class TaskController{
         TemporalRepository.INSTANCE.updateTaskState(taskId, Integer.parseInt(matcher.group(2)));
 	}
 	
-	private boolean canReadTask(User user, int taskId){
+	public static boolean canReadTask(User user, int taskId){
 		return user.isAdmin() || Permission.canAccessTask(user.getId(), taskId,
 				access -> true,
 				(access, override)-> true
 			);
 	}
 	
-	private boolean canAddElementTask(User user, int taskId){
+	public static boolean canAddElementTask(User user, int taskId){
 		return user.isAdmin() || Permission.canAccessTask(user.getId(), taskId,
 				access -> canAccess(access, Permission.PERM_ADD) || canAccess(access, Permission.PERM_ADMIN),
 				(access, override)-> {
@@ -135,7 +135,7 @@ public class TaskController{
 			);
 	}
 	
-	private boolean canUpdateTask(User user, int taskId){
+	public static boolean canUpdateTask(User user, int taskId){
 		return user.isAdmin() || Permission.canAccessTask(user.getId(), taskId,
 				access -> canAccess(access, Permission.PERM_UPDATE) || canAccess(access, Permission.PERM_ADMIN),
 				(access, override)-> {
@@ -145,7 +145,7 @@ public class TaskController{
 			);
 	}
 	
-	private boolean canDeleteTask(User user, int taskId){
+	public static boolean canDeleteTask(User user, int taskId){
 		return user.isAdmin() || Permission.canAccessTask(user.getId(), taskId,
 				access -> canAccess(access, Permission.PERM_DELETE) || canAccess(access, Permission.PERM_ADMIN),
 				(access, override)-> {
