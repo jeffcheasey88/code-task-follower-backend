@@ -11,7 +11,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,12 +42,18 @@ public class ModelBinder implements ExecutableProvider{
 			if(parameter.getType().equals(User.class)) parameter.setValue(context.getUser());
 			else if(parameter.getType().getPackage().getName().contains("codetaskfollower.dto")){
 				parameter.setValue(toDto(reader.readJson(), parameter.getType()));
-			}else if(parameter.getType().getPackage().getName().endsWith("codetaskfollower.model")){
-				Repository<Object,Object> repository = (Repository<Object, Object>) this.dependencies.find(null, Class.forName("be.jeffcheasey88.codetaskfollower.repository." + parameter.getType().getSimpleName() + "Repository"), null);
+			}else{
 				Argument key = parameter.getAnnotation(Argument.class);
-				Object model = repository.findById(repository.parseKey(matcher.group(key.value())));
-				if(model == null) throw new HttpError(404);
-				parameter.setValue(model);
+				if(key != null){
+					if(parameter.getType().getPackage().getName().endsWith("codetaskfollower.model")){
+						Repository<Object,Object> repository = (Repository<Object, Object>) this.dependencies.find(null, Class.forName("be.jeffcheasey88.codetaskfollower.repository." + parameter.getType().getSimpleName() + "Repository"), null);
+						Object model = repository.findById(repository.parseKey(matcher.group(key.value())));
+						if(model == null) throw new HttpError(404);
+						parameter.setValue(model);
+					}else if(parameter.getType().equals(Integer.TYPE)){
+						parameter.setValue(Integer.parseInt(matcher.group(key.value())));
+					}
+				}
 			}
 		}
 	}

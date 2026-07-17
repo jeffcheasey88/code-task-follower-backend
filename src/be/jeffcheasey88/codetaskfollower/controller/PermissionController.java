@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 import be.jeffcheasey88.codetaskfollower.configuration.Authenticator.User;
+import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Argument;
 import be.jeffcheasey88.codetaskfollower.exception.HttpError;
 import be.jeffcheasey88.codetaskfollower.model.Player;
 import be.jeffcheasey88.codetaskfollower.tmp.Permission;
@@ -75,10 +76,9 @@ public class PermissionController{
 	}
 	
 	@Route(path = "/players/(\\d+)", needLogin = true)
-	public List<PlayerTreasurePermission> getPlayerPermission(User user, Matcher matcher){
+	public List<PlayerTreasurePermission> getPlayerPermission(User user, @Argument int id){
 		if(!user.isAdmin()) throw new HttpError(403);
 		
-		int id = Integer.parseInt(matcher.group(1));
 		return Permission.getEntityPermissions("player", id).stream().map(perm ->
 			new PlayerTreasurePermission(
 					perm.entityType(),
@@ -93,8 +93,7 @@ public class PermissionController{
 	}
 	
 	@Route(path = "/projects/(\\d+)/players", needLogin = true)
-	public List<PlayerPermission> getProjectPlayers(User user, Matcher matcher){
-		int projectId = Integer.parseInt(matcher.group(1));
+	public List<PlayerPermission> getProjectPlayers(User user, @Argument int projectId){
 		if(!ProjectController.canAdminProject(user, projectId)) throw new HttpError(403);
 		return Permission.getEntityPermissions("player", "project", projectId).stream().map(perm -> {
 			return new PlayerPermission(
@@ -111,10 +110,8 @@ public class PermissionController{
 	}
 	
 	@Route(path = "/projects/(\\d+)/players/(\\d+)", needLogin = true)
-	public PlayerPermission getProjectPlayer(User user, Matcher matcher){
-		int projectId = Integer.parseInt(matcher.group(1));
+	public PlayerPermission getProjectPlayer(User user, @Argument int projectId, @Argument(2) int playerId){
 		if(!ProjectController.canAdminProject(user, projectId)) throw new HttpError(403);
-		int playerId = Integer.parseInt(matcher.group(2));
 		int access = Permission.getAccess("player", playerId, "Project", projectId);
 		if(access < 0) throw new HttpError(404);
 		return new PlayerPermission(
@@ -129,43 +126,28 @@ public class PermissionController{
 	}
 	
 	@Route(path = "/projects/(\\d+)/players", needLogin = true, type = POST)
-	public void addProjectPlayer(User user, Matcher matcher, PlayerPermissionDto permissionDto){
-		int projectId = Integer.parseInt(matcher.group(1));
+	public void addProjectPlayer(User user, @Argument int projectId, PlayerPermissionDto permissionDto){
 		if(!ProjectController.canAdminProject(user, projectId)) throw new HttpError(403);
 		if(Permission.getAccess("player", permissionDto.playerId(), "Project", projectId) >= 0) throw new HttpError(400);
-		int access = 0;
-		if(permissionDto.add()) access+=Permission.PERM_ADD;
-		if(permissionDto.update()) access+=Permission.PERM_UPDATE;
-		if(permissionDto.delete()) access+=Permission.PERM_DELETE;
-		if(permissionDto.admin()) access+=Permission.PERM_ADMIN;
-		Permission.giveAccess("Project", projectId, "player", permissionDto.playerId(), access);
+		Permission.giveAccess("Project", projectId, "player", permissionDto.playerId(), toAccess(permissionDto));
 	}
 	
 	@Route(path = "/projects/(\\d+)/players", needLogin = true, type = PUT)
-	public void updateProjectPlayer(User user, Matcher matcher, PlayerPermissionDto permissionDto){
-		int projectId = Integer.parseInt(matcher.group(1));
+	public void updateProjectPlayer(User user, @Argument int projectId, PlayerPermissionDto permissionDto){
 		if(!ProjectController.canAdminProject(user, projectId)) throw new HttpError(403);
 		if(Permission.getAccess("player", permissionDto.playerId(), "Project", projectId) < 0) throw new HttpError(400);
-		int access = 0;
-		if(permissionDto.add()) access+=Permission.PERM_ADD;
-		if(permissionDto.update()) access+=Permission.PERM_UPDATE;
-		if(permissionDto.delete()) access+=Permission.PERM_DELETE;
-		if(permissionDto.admin()) access+=Permission.PERM_ADMIN;
-		Permission.updateAccess("Project", projectId, "player", permissionDto.playerId(), access);
+		Permission.updateAccess("Project", projectId, "player", permissionDto.playerId(), toAccess(permissionDto));
 	}
 	
 	@Route(path = "/projects/(\\d+)/players/(\\d+)", needLogin = true, type = DELETE)
-	public void deleteProjectPlayer(User user, Matcher matcher){
-		int projectId = Integer.parseInt(matcher.group(1));
+	public void deleteProjectPlayer(User user, @Argument int projectId, @Argument(2) int playerId){
 		if(!ProjectController.canAdminProject(user, projectId)) throw new HttpError(403);
-		int playerId = Integer.parseInt(matcher.group(2));
 		if(Permission.getAccess("player", playerId, "Project", projectId) < 0) throw new HttpError(400);
 		Permission.revokeAccess("Project", projectId, "player", playerId);
 	}
 	
 	@Route(path = "/tasks/(\\d+)/players", needLogin = true)
-	public List<PlayerPermission> getTaskPlayers(User user, Matcher matcher){
-		int taskId = Integer.parseInt(matcher.group(1));
+	public List<PlayerPermission> getTaskPlayers(User user, @Argument int taskId){
 		if(!TaskController.canAdminTask(user, taskId)) throw new HttpError(403);
 		return Permission.getEntityPermissions("player", "task", taskId).stream().map(perm -> {
 			return new PlayerPermission(
@@ -182,10 +164,8 @@ public class PermissionController{
 	}
 	
 	@Route(path = "/tasks/(\\d+)/players/(\\d+)", needLogin = true)
-	public PlayerPermission getTaskPlayer(User user, Matcher matcher){
-		int taskId = Integer.parseInt(matcher.group(1));
+	public PlayerPermission getTaskPlayer(User user, @Argument int taskId, @Argument(2) int playerId){
 		if(!TaskController.canAdminTask(user, taskId)) throw new HttpError(403);
-		int playerId = Integer.parseInt(matcher.group(2));
 		int access = Permission.getAccess("player", playerId, "Task", taskId);
 		if(access < 0) throw new HttpError(404);
 		return new PlayerPermission(
@@ -200,41 +180,36 @@ public class PermissionController{
 	}
 	
 	@Route(path = "/tasks/(\\d+)/players", needLogin = true, type = POST)
-	public void addTaskPlayer(User user, Matcher matcher, PlayerPermissionDto permissionDto){
-		int taskId = Integer.parseInt(matcher.group(1));
+	public void addTaskPlayer(User user, @Argument int taskId, PlayerPermissionDto permissionDto){
 		if(!TaskController.canAdminTask(user, taskId)) throw new HttpError(403);
 		if(Permission.getAccess("player", permissionDto.playerId(), "Task", taskId) >= 0) throw new HttpError(400);
-		int access = 0;
-		if(permissionDto.add()) access+=Permission.PERM_ADD;
-		if(permissionDto.update()) access+=Permission.PERM_UPDATE;
-		if(permissionDto.delete()) access+=Permission.PERM_DELETE;
-		if(permissionDto.admin()) access+=Permission.PERM_ADMIN;
-		Permission.giveAccess("Task", taskId, "player", permissionDto.playerId(), access);
+		Permission.giveAccess("Task", taskId, "player", permissionDto.playerId(), toAccess(permissionDto));
 	}
 	
 	@Route(path = "/tasks/(\\d+)/players", needLogin = true, type = PUT)
-	public void updateTaskPlayer(User user, Matcher matcher, PlayerPermissionDto permissionDto){
-		int taskId = Integer.parseInt(matcher.group(1));
+	public void updateTaskPlayer(User user, @Argument int taskId, PlayerPermissionDto permissionDto){
 		if(!TaskController.canAdminTask(user, taskId)) throw new HttpError(403);
 		if(Permission.getAccess("player", permissionDto.playerId(), "Task", taskId) < 0) throw new HttpError(400);
-		int access = 0;
-		if(permissionDto.add()) access+=Permission.PERM_ADD;
-		if(permissionDto.update()) access+=Permission.PERM_UPDATE;
-		if(permissionDto.delete()) access+=Permission.PERM_DELETE;
-		if(permissionDto.admin()) access+=Permission.PERM_ADMIN;
-		Permission.updateAccess("Task", taskId, "player", permissionDto.playerId(), access);
+		Permission.updateAccess("Task", taskId, "player", permissionDto.playerId(), toAccess(permissionDto));
 	}
 	
 	@Route(path = "/tasks/(\\d+)/players/(\\d+)", needLogin = true, type = DELETE)
-	public void deleteTaskPlayer(User user, Matcher matcher){
-		int taskId = Integer.parseInt(matcher.group(1));
+	public void deleteTaskPlayer(User user, @Argument int taskId, @Argument(2) int playerId){
 		if(!TaskController.canAdminTask(user, taskId)) throw new HttpError(403);
-		int playerId = Integer.parseInt(matcher.group(2));
 		if(Permission.getAccess("player", playerId, "Task", taskId) < 0) throw new HttpError(400);
 		Permission.revokeAccess("Task", taskId, "player", playerId);
 	}
 	
 	private String getUsername(int playerId){
-		return TreasureCache.<Player>selectAll().filter(p->p.getId() == playerId).get().getUsername();
+		return TreasureCache.<Player>selectAll().filter(player->player.getId() == playerId).get().getUsername();
+	}
+	
+	private int toAccess(PlayerPermissionDto permissionDto){
+		if(permissionDto.admin) return Permission.PERM_ADMIN;
+		int access = 0;
+		if(permissionDto.add()) access+=Permission.PERM_ADD;
+		if(permissionDto.update()) access+=Permission.PERM_UPDATE;
+		if(permissionDto.delete()) access+=Permission.PERM_DELETE;
+		return access;
 	}
 }
