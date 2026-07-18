@@ -527,10 +527,10 @@ public class TemporalRepository{
 	}
 
 	interface NewTask{
-		Task create(int id, String name, String description, List<Tag> tags, List<Task> dependencies, List<Project> projects, List<Commit> commits, List<Branch> branches, List<Code> codes);
+		Task create(int id, String name, String description, int estimateSeconds, List<Tag> tags, List<Task> dependencies, List<Project> projects, List<Commit> commits, List<Branch> branches, List<Code> codes);
 	}
 	private Task trickTask(int id, String name){
 		NewTask creator = Task::new;
-		return creator.create(id, name, null, null, null, null, null, null, null);
+		return creator.create(id, name, null, 0, null, null, null, null, null, null);
 	}
 }

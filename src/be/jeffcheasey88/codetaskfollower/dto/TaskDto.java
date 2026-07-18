@@ -6,6 +6,7 @@ public record TaskDto (
 	Integer id,
 	String name,
 	String description,
+	Integer estimateSeconds,
 	Integer stateId,
 	List<Integer> tags,
 	List<TaskDto> dependencies,

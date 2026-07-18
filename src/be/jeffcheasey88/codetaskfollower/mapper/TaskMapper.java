@@ -16,6 +16,7 @@ public class TaskMapper extends Mapper<TaskDto, LightTaskDto, Task>{
 			model.getId(),
 			model.getName(),
 			model.getDescription(),
+			0,
 			null, //model.getState(),
 			model.getTags() == null ? null : tagMapper.toDto(model.getTags()).stream().map(t -> t.getId()).toList(),
 			toDto(model.getDependencies()),
@@ -43,11 +44,13 @@ public class TaskMapper extends Mapper<TaskDto, LightTaskDto, Task>{
 	public void fullCopyDtoToModel(TaskDto dto, Task model) {
 		model.setName(dto.name());
 		model.setDescription(dto.description());
+		model.setEstimateSeconds(dto.estimateSeconds());
 	}
 
 	@Override
 	public void safeCopyDtoToModel(TaskDto dto, Task model) {
 		if(dto.name() != null) model.setName(dto.name());
 		if(dto.description() != null) model.setDescription(dto.description());
+		if(dto.estimateSeconds() != null) model.setEstimateSeconds(dto.estimateSeconds());
 	}
 }

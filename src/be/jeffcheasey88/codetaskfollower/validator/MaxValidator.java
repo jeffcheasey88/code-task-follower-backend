@@ -30,12 +30,12 @@ public class MaxValidator extends Validator<Max, MaxContext>{
 		
 		@Override
 		public ValidatorMessage validate(Object object){
-			int min = max.value();
+			int value = max.value();
 			ValidatorMessage message = max.message();
 			
-			if(object == null) return message;
-			if(object instanceof String string && string.length() > min) return message;
-			if(object instanceof Number number && number.longValue() > min) return message;
+			if(object == null) return null;
+			if(object instanceof String string && string.length() > value) return message;
+			if(object instanceof Number number && number.longValue() > value) return message;
 			return null;
 		}
 	}

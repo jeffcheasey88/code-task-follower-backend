@@ -49,12 +49,12 @@ public class TaskController{
 	public TaskDto getTask(User user, @Argument Task task){
 		if(!canReadTask(user, task.getId())) throw new HttpError(403);
 		TaskDto taskDto = taskMapper.toDto(task);
-		return new TaskDto(taskDto.id(), taskDto.name(), taskDto.description(), TemporalRepository.INSTANCE.selectStateForTask(taskDto.id()).getId(), getTags(taskDto.id()).stream().map(t -> t.getId()).toList(), null, null, null, null, null);
+		return new TaskDto(taskDto.id(), taskDto.name(), taskDto.description(), taskDto.estimateSeconds(), TemporalRepository.INSTANCE.selectStateForTask(taskDto.id()).getId(), getTags(taskDto.id()).stream().map(t -> t.getId()).toList(), null, null, null, null, null);
 	}
 
 	@Route(path = "/tasks", type = POST, needLogin = true)
 	public int createTask(User user, TaskDto taskDto){
-		Task task = new Task(0, taskDto.name(), taskDto.description(), null, null, null, null, null, null);
+		Task task = new Task(0, taskDto.name(), taskDto.description(), 0, null, null, null, null, null, null);
 		Permission.giveAccess("Task", task.getId(), "player", user.getId(), Permission.PERM_ADMIN);
 		TemporalRepository.INSTANCE.updateTaskState(task.getId(), taskDto.stateId());
 		modelLocker.pushValue(new ModelUpdateDto(task, "create"));

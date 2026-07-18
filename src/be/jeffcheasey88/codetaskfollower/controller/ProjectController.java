@@ -134,7 +134,7 @@ public class ProjectController {
 			List<Tag> tags = TemporalRepository.INSTANCE.selectTags(t.id());
 			List<Integer> tagIds = tags.stream().map(dto -> dto.getId()).toList();
 			
-			return new TaskDto(t.id(), t.name(), t.description(), stateMapper.toDto(TemporalRepository.INSTANCE.selectStateForTask(t.id())).getId(), tagIds, null, null, null, null, null);
+			return new TaskDto(t.id(), t.name(), t.description(), t.estimateSeconds(), stateMapper.toDto(TemporalRepository.INSTANCE.selectStateForTask(t.id())).getId(), tagIds, null, null, null, null, null);
 		}).toList();
 	}
 	
