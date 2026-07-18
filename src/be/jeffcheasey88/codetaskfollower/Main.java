@@ -139,11 +139,15 @@ public class Main{
 	}
 	
 	private static void initDb(Configuration config){
-		List<Player> players = TreasureCache.<Player>selectAll().toList();
+		List<Player> players = getPlayers();
 		if(players.isEmpty()){
 			Player admin = new Player(0, config.getDefaultUserName(), Password.hash(config.getDefaultUserPassword()).withArgon2().getResult(), true);
 			System.out.println("Admin user created with id "+admin.getId()+" name "+admin.getUsername());
 		}
+	}
+	
+	private static List<Player> getPlayers(){
+		return TreasureCache.<Player>selectAll().toList();
 	}
 	
 	private static String toReturnString(Method method){
