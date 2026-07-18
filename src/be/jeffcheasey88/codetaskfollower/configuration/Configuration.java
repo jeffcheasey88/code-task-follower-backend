@@ -23,6 +23,9 @@ public class Configuration{
 	private String databaseName;
 	private String databaseUser;
 	private String databasePassword;
+	
+	private String defaultUserName = "admin";
+	private String defaultUserPassword = "admin";
 
 	public Configuration(){}
 	
@@ -90,6 +93,15 @@ public class Configuration{
 	public String getDatabasePassword(){
 		return this.databasePassword;
 	}
+	
+	public String getDefaultUserName(){
+		return this.defaultUserName;
+	}
+	
+	public String getDefaultUserPassword(){
+		return this.defaultUserPassword;
+	}
+	
 	
 	@Repeatable(Aliases.class)
 	@Retention(RetentionPolicy.RUNTIME)

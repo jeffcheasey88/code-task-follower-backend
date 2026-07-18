@@ -99,7 +99,7 @@ UNION ALL
 SELECT ta.roleType as roleType, ta.roleId as roleId, ta.taskId as entityId, ta.accessLevel as accessLevel, 'task' as entityType 
 FROM TaskAccess ta 
 
-UNION ALL
+UNION ALL 
 
 SELECT 'player' as roleType, pg.playerId as roleId, ta.taskId as entityId, ta.accessLevel as accessLevel, 'task' as entityType 
 FROM TaskAccess ta 

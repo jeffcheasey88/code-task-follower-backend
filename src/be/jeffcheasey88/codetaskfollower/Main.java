@@ -112,7 +112,7 @@ public class Main{
 		
 		router.registerPackages("be.jeffcheasey88.codetaskfollower.controller", injector);
 		
-		initDb();
+		initDb(config);
 		
 		System.out.println("routes:");
 		Iterator<RouteState> routeIterator = router.routeIterator();
@@ -138,11 +138,11 @@ public class Main{
 		return config;
 	}
 	
-	private static void initDb(){
+	private static void initDb(Configuration config){
 		List<Player> players = TreasureCache.<Player>selectAll().toList();
 		if(players.isEmpty()){
-			Player admin = new Player(0, "admin", Password.hash("admin").withArgon2().getResult(), true);
-			System.out.println("Admin user created with id "+admin.getId());
+			Player admin = new Player(0, config.getDefaultUserName(), Password.hash(config.getDefaultUserPassword()).withArgon2().getResult(), true);
+			System.out.println("Admin user created with id "+admin.getId()+" name "+admin.getUsername());
 		}
 	}
 	
