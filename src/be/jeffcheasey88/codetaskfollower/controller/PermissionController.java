@@ -63,8 +63,7 @@ public class PermissionController{
 
 	@Route(path="/players", needLogin = true)
 	public List<String> getPlayers(){
-		List<Player> players = TreasureCache.<Player>selectAll().toList();
-		return players.stream().map(Player::getUsername).toList();
+		return getAllPlayers().stream().map(Player::getUsername).toList();
 	}
 	
 	@Route(path="/players"+QueryParameters.QUERY_REGEX, needLogin = true)
@@ -73,8 +72,7 @@ public class PermissionController{
 		String nameQuery = parameters.getValue("name");
 		if(nameQuery == null) throw new HttpError(400);
 		String query = nameQuery.toLowerCase();
-		List<Player> players = TreasureCache.<Player>selectAll().toList();
-		return players.stream().map(Player::getUsername).filter(name -> name.toLowerCase().contains(query)).toList();
+		return getAllPlayers().stream().map(Player::getUsername).filter(name -> name.toLowerCase().contains(query)).toList();
 	}
 	
 	@Route(path = "/players/(\\d+)", needLogin = true)
@@ -202,8 +200,13 @@ public class PermissionController{
 		Permission.revokeAccess("Task", taskId, "player", playerId);
 	}
 	
+	private List<Player> getAllPlayers(){
+		return TreasureCache.<Player>selectAll().toList();
+	}
+	
 	private String getUsername(int playerId){
-		return TreasureCache.<Player>selectAll().filter(player->player.getId() == playerId).get().getUsername();
+		Player result = TreasureCache.<Player>selectAll().filter(player->player.getId() == playerId).get();
+		return result.getUsername();
 	}
 	
 	private int toAccess(PlayerPermissionDto permissionDto){
