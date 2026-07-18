@@ -63,7 +63,8 @@ public class PermissionController{
 
 	@Route(path="/players", needLogin = true)
 	public List<String> getPlayers(){
-		return TreasureCache.<Player>selectAll().toList().stream().map(Player::getUsername).toList();
+		List<Player> players = TreasureCache.<Player>selectAll().toList();
+		return players.stream().map(Player::getUsername).toList();
 	}
 	
 	@Route(path="/players"+QueryParameters.QUERY_REGEX, needLogin = true)
@@ -72,7 +73,8 @@ public class PermissionController{
 		String nameQuery = parameters.getValue("name");
 		if(nameQuery == null) throw new HttpError(400);
 		String query = nameQuery.toLowerCase();
-		return TreasureCache.<Player>selectAll().toList().stream().map(Player::getUsername).filter(name -> name.toLowerCase().contains(query)).toList();
+		List<Player> players = TreasureCache.<Player>selectAll().toList();
+		return players.stream().map(Player::getUsername).filter(name -> name.toLowerCase().contains(query)).toList();
 	}
 	
 	@Route(path = "/players/(\\d+)", needLogin = true)
