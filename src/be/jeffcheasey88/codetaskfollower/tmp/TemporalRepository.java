@@ -15,6 +15,7 @@ import dev.peerat.mapping.Ship;
 import dev.peerat.mapping.ShipwreckException;
 import dev.peerat.mapping.providers.mysql.MySQLCompass;
 import be.jeffcheasey88.codetaskfollower.model.Branch;
+import be.jeffcheasey88.codetaskfollower.model.ChronometerPart;
 import be.jeffcheasey88.codetaskfollower.model.Code;
 import be.jeffcheasey88.codetaskfollower.model.Commit;
 import be.jeffcheasey88.codetaskfollower.model.Project;
@@ -201,11 +202,11 @@ public class TemporalRepository{
 	}
 	
 	//chronometerparts (chronometerId)
-	public void updateChronometerPart(int chronometerPartId, int taskchronometerIdId){
+	public void updateChronometerPart(int chronometerPartId, int chronometerId){
 		ensureConnection();
 		try{
 			PreparedStatement p = this.con.prepareStatement("UPDATE chronometerparts SET chronometerId = ? WHERE id = ?");
-			p.setInt(1, taskchronometerIdId);
+			p.setInt(1, chronometerId);
 			p.setInt(2, chronometerPartId);
 			if(p.executeUpdate() >= 0) return;
 		}catch(Exception e){
@@ -441,6 +442,20 @@ public class TemporalRepository{
 			p.setString(1, state.getName());
 			p.setString(2, state.getColor());
 			p.setInt(3, state.getId());
+			if(p.executeUpdate() >= 0) return;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
+		}
+		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	}
+	
+	public void updateChronometerPart(ChronometerPart part){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement("UPDATE chronometerparts SET seconds = ?, description = ? WHERE id = ?");
+			p.setInt(1, part.getSeconds());
+			p.setString(2, part.getDescription());
+			p.setInt(3, part.getId());
 			if(p.executeUpdate() >= 0) return;
 		}catch(Exception e){
 			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);

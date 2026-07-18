@@ -4,11 +4,22 @@ public class ChronometerPartDto{
 	private Integer id;
 	private Integer seconds;
 	private String description;
-	private ChronometerDto chronometer;
-	public ChronometerPartDto(Integer id, Integer seconds, String description, ChronometerDto chronometer){
+	public ChronometerPartDto(Integer id, Integer seconds, String description){
 		this.id = id;
 		this.seconds = seconds;
 		this.description = description;
-		this.chronometer = chronometer;
 	}
+	
+	public Integer getId(){
+		return this.id;
+	}
+	
+	public Integer getSeconds(){
+		return this.seconds;
+	}
+	
+	public String getDescription(){
+		return this.description;
+	}
+	
 }

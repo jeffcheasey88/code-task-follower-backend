@@ -11,4 +11,16 @@ public class ChronometerDto{
 		this.seconds = seconds;
 		this.parts = parts;
 	}
+	
+	public Integer getId(){
+		return this.id;
+	}
+	
+	public Integer getSeconds(){
+		return this.seconds;
+	}
+	
+	public List<ChronometerPartDto> getParts(){
+		return this.parts;
+	}
 }
