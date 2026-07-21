@@ -40,7 +40,7 @@ public class ModelBinder implements ExecutableProvider{
 	public void provide(Matcher matcher, Context context, HttpReader reader, HttpWriter writer, Method method, Parameter[] parameters) throws Exception{
 		for(Parameter parameter : parameters){
 			if(User.class.isAssignableFrom(parameter.getType())) parameter.setValue(context.getUser());
-			else if(parameter.getType().getPackage().getName().contains("codetaskfollower.dto")){
+			else if(parameter.getType().getPackage().getName().contains("codetaskfollower.dto") || parameter.getType().getSimpleName().toLowerCase().endsWith("dto")){
 				parameter.setValue(toDto(reader.readJson(), parameter.getType()));
 			}else{
 				Argument key = parameter.getAnnotation(Argument.class);

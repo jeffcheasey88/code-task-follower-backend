@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -370,6 +371,24 @@ public class TemporalRepository{
 				);
 	}
 	
+	public static int insertKey(String table, List<String> fields, SqlParam... params){
+		String updateFields = "";
+		String bindingFields = "";
+		Iterator<String> fieldIterator = fields.iterator();
+		while(fieldIterator.hasNext()){
+			updateFields+=fieldIterator.next();
+			bindingFields+="?";
+			if(fieldIterator.hasNext()){
+				updateFields+=",";
+				bindingFields+=",";
+			}
+		}
+		return INSTANCE.insertKeyRequest(
+				"INSERT INTO "+table+" ("+updateFields+") VALUES ("+bindingFields+")",
+				params
+				);
+	}
+	
 	public static void update(String table, List<String> fields, List<String> idField, SqlParam... params){
 		String updateFields = "";
 		Iterator<String> fieldIterator = fields.iterator();
@@ -397,6 +416,10 @@ public class TemporalRepository{
 		return new SqlParam("int", value);
 	}
 	
+	public static SqlParam param(boolean value){
+		return new SqlParam("boolean", value);
+	}
+	
 	public void updateRequest(String sqlRequest, SqlParam... params){
 		ensureConnection();
 		try{
@@ -408,10 +431,38 @@ public class TemporalRepository{
 						p.setString(index+1, (String) param.value());
 					}else if(param.type().equals("int")){
 						p.setInt(index+1, (int) param.value());
+					}else if(param.type.equals("boolean")){
+						p.setBoolean(index+1, (boolean) param.value());
 					}
 				}
 			}
 			if(p.executeUpdate() >= 0) return;
+		}catch(Exception e){
+			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
+		}
+		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	}
+	
+	public int insertKeyRequest(String sqlRequest, SqlParam... params){
+		ensureConnection();
+		try{
+			PreparedStatement p = this.con.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS);
+			if(params != null && params.length > 0){
+				for(int index = 0; index < params.length; index++){
+					SqlParam param = params[index];
+					if(param.type().equals("String")){
+						p.setString(index+1, (String) param.value());
+					}else if(param.type().equals("int")){
+						p.setInt(index+1, (int) param.value());
+					}else if(param.type.equals("boolean")){
+						p.setBoolean(index+1, (boolean) param.value());
+					}
+				}
+			}
+			if(p.executeUpdate() >= 0){
+				ResultSet r = p.getGeneratedKeys();
+				if (r.next()) return (r.getInt(1));
+			}
 		}catch(Exception e){
 			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
 		}
@@ -429,6 +480,8 @@ public class TemporalRepository{
 						p.setString(index+1, (String) param.value());
 					}else if(param.type().equals("int")){
 						p.setInt(index+1, (int) param.value());
+					}else if(param.type.equals("boolean")){
+						p.setBoolean(index+1, (boolean) param.value());
 					}
 				}
 			}
