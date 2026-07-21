@@ -9,6 +9,7 @@ import static dev.peerat.framework.RequestType.PUT;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class Main{
 		router.setMapper(mapper);
 		router.setInternalErrorResponse(mapper);
 		
-		router.setAuthenticator(new Authenticator());
+		router.setAuthenticator(new Authenticator(new HashSet<>()));
 		router.bind(new ModelBinder(injector));
 		
 		new Thread(() -> router.getLogger().listen(context -> {

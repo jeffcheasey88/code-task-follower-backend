@@ -21,7 +21,7 @@ public class Permission{
 	}
 
 	public static void giveAccess(String entityType, int entityId, String roleType, int roleId, int accessLevel){
-		TemporalRepository.INSTANCE.externalUpdateRequest(
+		TemporalRepository.INSTANCE.updateRequest(
 				"INSERT INTO "+entityType+"Access (roleType,roleId,"+entityType.toLowerCase()+"Id, accessLevel) VALUES (?,?,?,?)",
 				new SqlParam("String",roleType),
 				new SqlParam("int",roleId),
@@ -36,7 +36,7 @@ public class Permission{
 	}
 	
 	public static void revokeAccess(String entityType, int entityId, String roleType, int roleId){
-		TemporalRepository.INSTANCE.externalUpdateRequest(
+		TemporalRepository.INSTANCE.updateRequest(
 				"DELETE FROM "+entityType+"Access WHERE roleType = ? AND roleId = ? AND "+entityType.toLowerCase()+"Id = ?)",
 				new SqlParam("String",roleType),
 				new SqlParam("int",roleId),
@@ -45,7 +45,7 @@ public class Permission{
 	}
 	
 	public static boolean canAccessProject(int playerId, int projectId, Predicate<Integer> validator){
-		List<Integer> results = TemporalRepository.INSTANCE.externalSelectRequest(
+		List<Integer> results = TemporalRepository.INSTANCE.selectRequest(
 				"SELECT accessLevel FROM ProjectAccessView WHERE playerId = ? AND projectId = ?",
 				(r) -> {
 					try {
@@ -60,7 +60,7 @@ public class Permission{
 	}
 	
 	public static boolean canAccessTask(int playerId, int taskId, Predicate<Integer> taskValidator, BiPredicate<Integer, Boolean	> projectValidator){
-		List<TreasureAccess> results = TemporalRepository.INSTANCE.externalSelectRequest(
+		List<TreasureAccess> results = TemporalRepository.INSTANCE.selectRequest(
 				"SELECT accessLevel, entityLevel FROM TaskAccessView WHERE playerId = ? AND taskId = ?",
 				(r) -> {
 					try {
@@ -91,7 +91,7 @@ public class Permission{
 	}
 	
 	public static List<EnityPermission> getEntityPermissions(String roleType, int roleId){
-		return TemporalRepository.INSTANCE.externalSelectRequest(
+		return TemporalRepository.INSTANCE.selectRequest(
 				"SELECT * FROM EntityPermissionView WHERE roleType = ? AND roleId = ?",
 				(row) -> {
 					try {
@@ -111,7 +111,7 @@ public class Permission{
 	}
 	
 	public static List<EnityPermission> getEntityPermissions(String roleType, String entityType, int entityId){
-		return TemporalRepository.INSTANCE.externalSelectRequest(
+		return TemporalRepository.INSTANCE.selectRequest(
 				"SELECT * FROM EntityPermissionView WHERE roleType = ? AND entityId = ? AND entityType = ?",
 				(row) -> {
 					try {
@@ -132,7 +132,7 @@ public class Permission{
 	}
 	
 	public static int getAccess(String roleType, int roleId, String entityType, int entityId){
-		List<Integer> results = TemporalRepository.INSTANCE.externalSelectRequest(
+		List<Integer> results = TemporalRepository.INSTANCE.selectRequest(
 				"SELECT accessLevel FROM "+entityType+"Access WHERE roleId = ? AND roleType = ? AND "+entityType.toLowerCase()+"Id = ?",
 				(r) -> {
 					try {

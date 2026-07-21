@@ -5,15 +5,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
-import dev.peerat.mapping.CursedTreasureException;
-import dev.peerat.mapping.Ship;
-import dev.peerat.mapping.ShipwreckException;
-import dev.peerat.mapping.providers.mysql.MySQLCompass;
 import be.jeffcheasey88.codetaskfollower.model.Branch;
 import be.jeffcheasey88.codetaskfollower.model.ChronometerPart;
 import be.jeffcheasey88.codetaskfollower.model.Code;
@@ -22,6 +20,10 @@ import be.jeffcheasey88.codetaskfollower.model.Project;
 import be.jeffcheasey88.codetaskfollower.model.State;
 import be.jeffcheasey88.codetaskfollower.model.Tag;
 import be.jeffcheasey88.codetaskfollower.model.Task;
+import dev.peerat.mapping.CursedTreasureException;
+import dev.peerat.mapping.Ship;
+import dev.peerat.mapping.ShipwreckException;
+import dev.peerat.mapping.providers.mysql.MySQLCompass;
 
 public class TemporalRepository{
 	
@@ -41,444 +43,361 @@ public class TemporalRepository{
 	}
 	
 	//ProjectStates (projectId, stateId)
-	public void insertProjectStates(Project project, State state){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("INSERT INTO ProjectStates (projectId,stateId) VALUES (?,?)");
-			p.setInt(1, project.getId());
-			p.setInt(2, state.getId());
-			if(project.getStates() == null) project.setStates(new LinkedList<>());
-			project.getStates().add(state);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void insertProjectStates(Project project, State state){
+		insert(
+				"ProjectStates",
+				List.of("projectId", "stateId"),
+				param(project.getId()),
+				param(state.getId())
+		);
+		trickAppend(project::getStates, project::setStates, state);
 	}
 
-	public void insertProjectTasks(int projectId, int taskId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("INSERT INTO TaskProject (projectId,taskId) VALUES (?,?)");
-			p.setInt(1, projectId);
-			p.setInt(2, taskId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
-	}
-	
-	public void removeProjectStates(Project project, State state){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("DELETE FROM ProjectStates WHERE projectId = ? AND stateId = ?");
-			p.setInt(1, project.getId());
-			p.setInt(2, state.getId());
-			if(project.getStates() != null){
-				project.setStates(project.getStates().stream().filter(s->s.getId() != s.getId()).toList());
-			}
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void removeProjectStates(Project project, State state){
+		delete(
+				"ProjectStates",
+				List.of("projectId", "stateId"),
+				param(project.getId()),
+				param(state.getId())
+		);
+		trickRemove(project::getStates, project::setStates, s -> s.getId() != state.getId());
 	}
 	
 	
 	//tasks (stateId)
-	public void updateTaskState(int taskId, int stateId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("UPDATE tasks SET stateId = ? WHERE id = ?");
-			p.setInt(1, stateId);
-			p.setInt(2, taskId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void updateTaskState(int taskId, int stateId){
+		update(
+				"tasks",
+				List.of("stateId"),
+				List.of("id"),
+				param(stateId),
+				param(taskId)
+		);
 	}
 	
 	//TaskProject (projectId, taskId)
-	public void insertTaskProject(int projectId, int taskId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("INSERT INTO TaskProject (projectId,taskId) VALUES (?,?)");
-			p.setInt(1, projectId);
-			p.setInt(2, taskId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void insertTaskProject(int projectId, int taskId){
+		insert(
+				"TaskProject",
+				List.of("projectId", "taskId"),
+				param(projectId),
+				param(taskId)
+		);
 	}
 	
-	public void removeTaskProject(int projectId, int taskId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("DELETE FROM TaskProject WHERE projectId = ? AND taskId = ?");
-			p.setInt(1, projectId);
-			p.setInt(2, taskId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void removeTaskProject(int projectId, int taskId){
+		delete(
+				"TaskProject",
+				List.of("projectId", "taskId"),
+				param(projectId),
+				param(taskId)
+		);
 	}
 
-	public void removeTaskAnyProject(int taskId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("DELETE FROM TaskProject WHERE taskId = ?");
-			p.setInt(1, taskId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void removeTaskAnyProject(int taskId){
+		delete(
+				"TaskProject",
+				List.of("taskId"),
+				param(taskId)
+		);
 	}
 
-	public void removeTaskAnyTag(int taskId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("DELETE FROM TaskTag WHERE taskId = ?");
-			p.setInt(1, taskId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void removeTaskAnyTag(int taskId){
+		delete(
+				"TaskTag",
+				List.of("taskId"),
+				param(taskId)
+		);
 	}
 	
 	//CommitTask (commitId, taskId)
-	public void insertCommitTask(int commitId, int taskId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("INSERT INTO CommitTask (commitId,taskId) VALUES (?,?)");
-			p.setInt(1, commitId);
-			p.setInt(2, taskId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void insertCommitTask(int commitId, int taskId){
+		insert(
+				"CommitTask",
+				List.of("commitId", "taskId"),
+				param(commitId),
+				param(taskId)
+		);
 	}
 	
-	public void removeCommitTask(int commitId, int taskId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("DELETE FROM CommitTask WHERE commitId = ? AND taskId = ?");
-			p.setInt(1, commitId);
-			p.setInt(2, taskId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void removeCommitTask(int commitId, int taskId){
+		delete(
+				"CommitTask",
+				List.of("commitId","taskId"),
+				param(commitId),
+				param(taskId)
+		);
 	}
 	
 	//chronometers (taskId)
-	public void updateChronometerTask(int chronometerId, int taskId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("UPDATE chronometers SET taskId = ? WHERE id = ?");
-			p.setInt(1, taskId);
-			p.setInt(2, chronometerId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void updateChronometerTask(int chronometerId, int taskId){
+		update(
+				"chronometers",
+				List.of("taskId"),
+				List.of("id"),
+				param(taskId),
+				param(chronometerId)
+		);
 	}
 	
 	//chronometerparts (chronometerId)
-	public void updateChronometerPart(int chronometerPartId, int chronometerId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("UPDATE chronometerparts SET chronometerId = ? WHERE id = ?");
-			p.setInt(1, chronometerId);
-			p.setInt(2, chronometerPartId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void updateChronometerPart(int chronometerPartId, int chronometerId){
+		update(
+				"chronometerparts",
+				List.of("chronometerId"),
+				List.of("id"),
+				param(chronometerId),
+				param(chronometerPartId)
+		);
 	}
 	
 	//TaskBranch (taskId, branchId)
-	public void insertTaskBranch(int taskId, int branchId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("INSERT INTO TaskBranch (taskId,branchId) VALUES (?,?)");
-			p.setInt(1, taskId);
-			p.setInt(2, branchId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void insertTaskBranch(int taskId, int branchId){
+		insert(
+				"TaskBranch",
+				List.of("taskId", "branchId"),
+				param(taskId),
+				param(branchId)
+		);
 	}
 	
-	public void removeTaskBranch(int taskId, int branchId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("DELETE FROM TaskBranch WHERE taskId = ? AND branchId = ?");
-			p.setInt(1, taskId);
-			p.setInt(2, branchId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void removeTaskBranch(int taskId, int branchId){
+		delete(
+				"TaskBranch",
+				List.of("taskId","branchId"),
+				param(taskId),
+				param(branchId)
+		);
 	}
 	
 	//ProjectBranch (projectId, branchId)
-	public void insertProjectBranch(int projectId, int branchId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("INSERT INTO ProjectBranch (projectId,branchId) VALUES (?,?)");
-			p.setInt(1, projectId);
-			p.setInt(2, branchId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void insertProjectBranch(int projectId, int branchId){
+		insert(
+				"ProjectBranch",
+				List.of("projectId", "branchId"),
+				param(projectId),
+				param(branchId)
+		);
 	}
 	
-	public void removeProjectBranch(int projectId, int branchId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("DELETE FROM ProjectBranch WHERE projectId = ? AND branchId = ?");
-			p.setInt(1, projectId);
-			p.setInt(2, branchId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void removeProjectBranch(int projectId, int branchId){
+		delete(
+				"ProjectBranch",
+				List.of("projectId","branchId"),
+				param(projectId),
+				param(branchId)
+		);
 	}
 	
 	//TaskTag (taskId, tagId)
-	public void insertTaskTag(Task task, Tag tag){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("INSERT INTO TaskTag (taskId,tagId) VALUES (?,?)");
-			p.setInt(1, task.getId());
-			p.setInt(2, tag.getId());
-			if(task.getTags() == null) task.setTags(new LinkedList<>());
-			task.getTags().add(tag);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void insertTaskTag(Task task, Tag tag){
+		insert(
+				"TaskTag",
+				List.of("taskId", "tagId"),
+				param(task.getId()),
+				param(tag.getId())
+		);
+		trickAppend(task::getTags, task::setTags, tag);
 	}
 	
-	public void removeTaskTag(Task task, Tag tag){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("DELETE FROM TaskTag WHERE taskId = ? AND tagId = ?");
-			p.setInt(1, task.getId());
-			p.setInt(2, tag.getId());
-			if(task.getTags() != null){
-				task.setTags(task.getTags().stream().filter(t->t.getId() != tag.getId()).toList());
-			}
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void removeTaskTag(Task task, Tag tag){
+		delete(
+				"TaskTag",
+				List.of("taskId","tagId"),
+				param(task.getId()),
+				param(tag.getId())
+		);
+		trickRemove(task::getTags, task::setTags, t -> t.getId() != tag.getId());
 	}
 	
 	//codes (branch)
-	public void updateCodeBranch(int codeId, int branchId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("UPDATE codes SET branch = ? WHERE id = ?");
-			p.setInt(1, branchId);
-			p.setInt(2, codeId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void updateCodeBranch(int codeId, int branchId){
+		update(
+				"codes",
+				List.of("branch"),
+				List.of("id"),
+				param(branchId),
+				param(codeId)
+		);
 	}
 	
 	//TaskCode (taskId, codeId)
-	public void insertTaskCode(int taskId, int codeId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("INSERT INTO TaskCode (taskId,codeId) VALUES (?,?)");
-			p.setInt(1, taskId);
-			p.setInt(2, codeId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void insertTaskCode(int taskId, int codeId){
+		insert(
+				"TaskCode",
+				List.of("taskId", "codeId"),
+				param(taskId),
+				param(codeId)
+		);
 	}
 	
-	public void removeTaskCode(int taskId, int codeId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("DELETE FROM TaskCode WHERE taskId = ? AND codeId = ?");
-			p.setInt(1, taskId);
-			p.setInt(2, codeId);
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void removeTaskCode(int taskId, int codeId){
+		delete(
+				"TaskCode",
+				List.of("taskId","codeId"),
+				param(taskId),
+				param(codeId)
+		);
 	}
 	
-	public List<Tag> selectTags(int taskId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("SELECT t.* FROM tags t JOIN TaskTag tt ON tt.tagId = t.id JOIN tasks task ON task.id = tt.taskId WHERE task.id = ?");
-			p.setInt(1, taskId);
-			ResultSet r = p.executeQuery();
-			List<Tag> l = new ArrayList<>();
-			while(r.next()) l.add(trickTag(r.getInt("t.id"), r.getString("t.name"), r.getString("t.color")));
-			return l;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to get the treasure from the treasure's cache", e);
-		}
-
+	public static List<Tag> selectTags(int taskId){
+		return listSelect(
+				"SELECT t.* FROM tags t JOIN TaskTag tt ON tt.tagId = t.id JOIN tasks task ON task.id = tt.taskId WHERE task.id = ?",
+				r -> trickTag(r.getInt("t.id"), r.getString("t.name"), r.getString("t.color")),
+				param(taskId)
+				);
 	}
 	
-	public List<State> selectStates(int projectId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("SELECT s.* FROM states s JOIN ProjectStates ps ON ps.stateId = s.id JOIN projects p ON p.id = ps.projectId WHERE p.id = ?");
-			p.setInt(1, projectId);
-			ResultSet r = p.executeQuery();
-			List<State> l = new ArrayList<>();
-			while(r.next()) l.add(trickState(r.getInt("s.id"), r.getString("s.name"), r.getString("s.color")));
-			return l;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to get the treasure from the treasure's cache", e);
-		}
+	public static List<State> selectStates(int projectId){
+		return listSelect(
+				"SELECT s.* FROM states s JOIN ProjectStates ps ON ps.stateId = s.id JOIN projects p ON p.id = ps.projectId WHERE p.id = ?",
+				r -> trickState(r.getInt("s.id"), r.getString("s.name"), r.getString("s.color")),
+				param(projectId)
+				);
 	}
 	
-	public List<Task> selectTasks(int projectId){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("SELECT t.* FROM tasks t JOIN TaskProject tp ON tp.taskId = t.id WHERE tp.projectId = ?");
-			p.setInt(1, projectId);
-			ResultSet r = p.executeQuery();
-			List<Task> l = new ArrayList<>();
-			while(r.next()) l.add(trickTask(r.getInt("t.id"), r.getString("t.name")));
-			return l;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to get the treasure from the treasure's cache", e);
-		}
+	public static List<Task> selectTasks(int projectId){
+		return listSelect(
+				"SELECT t.* FROM tasks t JOIN TaskProject tp ON tp.taskId = t.id WHERE tp.projectId = ?",
+				r -> trickTask(r.getInt("t.id"), r.getString("t.name")),
+				param(projectId)
+				);
 	}
 
-	public State selectStateForTask(int taskId) {
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("SELECT s.* FROM tasks t JOIN states s ON t.stateId = s.id WHERE t.id = ?");
-			p.setInt(1, taskId);
-			ResultSet r = p.executeQuery();
-			r.next();
-			return trickState(r.getInt("s.id"), r.getString("s.name"), r.getString("s.color"));
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to get the treasure from the treasure's cache", e);
-		}
+	public static State selectStateForTask(int taskId){
+		return select(
+				"SELECT s.* FROM tasks t JOIN states s ON t.stateId = s.id WHERE t.id = ?",
+				r -> trickState(r.getInt("s.id"), r.getString("s.name"), r.getString("s.color")),
+				param(taskId)
+				);
 	}
 	
 	//UPDATES
-	public void updateTask(Task task){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("UPDATE tasks SET name = ?, description = ? WHERE id = ?");
-			p.setString(1, task.getName());
-			p.setString(2, task.getDescription());
-			p.setInt(3, task.getId());
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void updateTask(Task task){
+		update(
+				"tasks",
+				List.of("name","description"),
+				List.of("id"),
+				param(task.getName()),
+				param(task.getDescription()),
+				param(task.getId())
+		);
 	}
 	
-	public void updateTag(Tag tag){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("UPDATE tags SET name = ?, color = ? WHERE id = ?");
-			p.setString(1, tag.getName());
-			p.setString(2, tag.getColor());
-			p.setInt(3, tag.getId());
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void updateTag(Tag tag){
+		update(
+				"tags",
+				List.of("name","color"),
+				List.of("id"),
+				param(tag.getName()),
+				param(tag.getColor()),
+				param(tag.getId())
+		);
 	}
 	
-	public void updateState(State state){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("UPDATE states SET name = ?, color = ? WHERE id = ?");
-			p.setString(1, state.getName());
-			p.setString(2, state.getColor());
-			p.setInt(3, state.getId());
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void updateState(State state){
+		update(
+				"states",
+				List.of("name","color"),
+				List.of("id"),
+				param(state.getName()),
+				param(state.getColor()),
+				param(state.getId())
+		);
 	}
 	
-	public void updateChronometerPart(ChronometerPart part){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("UPDATE chronometerparts SET seconds = ?, description = ? WHERE id = ?");
-			p.setInt(1, part.getSeconds());
-			p.setString(2, part.getDescription());
-			p.setInt(3, part.getId());
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void updateChronometerPart(ChronometerPart part){
+		update(
+				"chronometerparts",
+				List.of("seconds","description"),
+				List.of("id"),
+				param(part.getSeconds()),
+				param(part.getDescription()),
+				param(part.getId())
+		);
 	}
 	
-	public void updateProject(Project project){
-		ensureConnection();
-		try{
-			PreparedStatement p = this.con.prepareStatement("UPDATE projects SET name = ?, color = ?, description = ? WHERE id = ?");
-			p.setString(1, project.getName());
-			p.setString(2, project.getColor());
-			p.setString(3, project.getDescription());
-			p.setInt(4, project.getId());
-			if(p.executeUpdate() >= 0) return;
-		}catch(Exception e){
-			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
-		}
-		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
+	public static void updateProject(Project project){
+		update(
+				"projects",
+				List.of("name","color","description"),
+				List.of("id"),
+				param(project.getName()),
+				param(project.getColor()),
+				param(project.getDescription()),
+				param(project.getId())
+		);
 	}
 	
-	public void externalUpdateRequest(String sqlRequest, SqlParam... params){
+	public static <T> List<T> listSelect(String sqlRequest, Converter<ResultSet, T> mapper, SqlParam... params){
+		return INSTANCE.selectRequest(sqlRequest, mapper, params);
+	}
+	
+	public static <T> T select(String sqlRequest, Converter<ResultSet, T> mapper, SqlParam... params){
+		List<T> results = INSTANCE.selectRequest(sqlRequest, mapper, params);
+		if(results == null || results.isEmpty()) return null;
+		return results.get(0);
+	}
+	
+	public static void delete(String table, List<String> fields, SqlParam... params){
+		String whereFields = "";
+		Iterator<String> whereIterator = fields.iterator();
+		while(whereIterator.hasNext()){
+			whereFields+=whereIterator.next()+" = ?";
+			if(whereIterator.hasNext()) whereFields+=" AND ";
+		}
+		INSTANCE.updateRequest(
+				"DELETE FROM "+table+" WHERE "+whereFields,
+				params
+				);
+	}
+	
+	public static void insert(String table, List<String> fields, SqlParam... params){
+		String updateFields = "";
+		String bindingFields = "";
+		Iterator<String> fieldIterator = fields.iterator();
+		while(fieldIterator.hasNext()){
+			updateFields+=fieldIterator.next();
+			bindingFields+="?";
+			if(fieldIterator.hasNext()){
+				updateFields+=",";
+				bindingFields+=",";
+			}
+		}
+		INSTANCE.updateRequest(
+				"INSERT INTO "+table+" ("+updateFields+") VALUES ("+bindingFields+")",
+				params
+				);
+	}
+	
+	public static void update(String table, List<String> fields, List<String> idField, SqlParam... params){
+		String updateFields = "";
+		Iterator<String> fieldIterator = fields.iterator();
+		while(fieldIterator.hasNext()){
+			updateFields+=fieldIterator.next()+" = ?";
+			if(fieldIterator.hasNext()) updateFields+=",";
+		}
+		String whereFields = "";
+		Iterator<String> whereIterator = idField.iterator();
+		while(whereIterator.hasNext()){
+			whereFields+=whereIterator.next()+" = ?";
+			if(whereIterator.hasNext()) whereFields+=" AND ";
+		}
+		INSTANCE.updateRequest(
+				"UPDATE "+table+" SET "+updateFields+" WHERE "+whereFields,
+				params
+				);
+	}
+	
+	public static SqlParam param(String value){
+		return new SqlParam("String", value);
+	}
+	
+	public static SqlParam param(int value){
+		return new SqlParam("int", value);
+	}
+	
+	public void updateRequest(String sqlRequest, SqlParam... params){
 		ensureConnection();
 		try{
 			PreparedStatement p = this.con.prepareStatement(sqlRequest);
@@ -499,7 +418,7 @@ public class TemporalRepository{
 		throw new CursedTreasureException("Failed to set the treasure in the treasure's cache");
 	}
 	
-	public <T> List<T> externalSelectRequest(String sqlRequest, Function<ResultSet, T> mapper, SqlParam... params){
+	public <T> List<T> selectRequest(String sqlRequest, Converter<ResultSet, T> mapper, SqlParam... params){
 		ensureConnection();
 		try{
 			PreparedStatement p = this.con.prepareStatement(sqlRequest);
@@ -515,7 +434,7 @@ public class TemporalRepository{
 			}
 			ResultSet r = p.executeQuery();
 			List<T> l = new ArrayList<>();
-			while(r.next()) l.add(mapper.apply(r));
+			while(r.next()) l.add(mapper.convert(r));
 			return l;
 		}catch(Exception e){
 			throw new CursedTreasureException("Failed to set the treasure in the treasure's cache", e);
@@ -523,12 +442,30 @@ public class TemporalRepository{
 	}
 	
 	public static record SqlParam(String type, Object value){}
+	
+	public static interface Converter<A, B>{
+		
+		B convert(A a) throws Exception;
+		
+	}
+	
+	private static <T> void trickAppend(Supplier<List<T>> getter, Consumer<List<T>> setter, T value){
+		List<T> list = getter.get();
+		if(list == null) setter.accept(list = new LinkedList<T>());
+		list.add(value);
+	}
+	
+	private static <T> void trickRemove(Supplier<List<T>> getter, Consumer<List<T>> setter, Predicate<T> filter){
+		List<T> list = getter.get();
+		if(list == null) return;
+		setter.accept(list.stream().filter(filter).toList());
+	}
 
 	interface NewTag{
 		Tag create(int id, String name, String color);
 	}
 	
-	private Tag trickTag(int id, String name, String color){
+	private static Tag trickTag(int id, String name, String color){
 		NewTag creator = Tag::new;
 		return creator.create(id, name, color);
 	}
@@ -536,7 +473,7 @@ public class TemporalRepository{
 	interface NewState{
 		State create(int id, String name, String color);
 	}
-	private State trickState(int id, String name, String color){
+	private static State trickState(int id, String name, String color){
 		NewState creator = State::new;
 		return creator.create(id, name, color);
 	}
@@ -544,7 +481,7 @@ public class TemporalRepository{
 	interface NewTask{
 		Task create(int id, String name, String description, int estimateSeconds, List<Tag> tags, List<Task> dependencies, List<Project> projects, List<Commit> commits, List<Branch> branches, List<Code> codes);
 	}
-	private Task trickTask(int id, String name){
+	private static Task trickTask(int id, String name){
 		NewTask creator = Task::new;
 		return creator.create(id, name, null, 0, null, null, null, null, null, null);
 	}

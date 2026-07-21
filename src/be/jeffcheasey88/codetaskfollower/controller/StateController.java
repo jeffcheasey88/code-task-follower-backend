@@ -1,5 +1,6 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
+import static be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository.*;
 import static dev.peerat.framework.RequestType.DELETE;
 import static dev.peerat.framework.RequestType.PATCH;
 import static dev.peerat.framework.RequestType.POST;
@@ -13,7 +14,6 @@ import be.jeffcheasey88.codetaskfollower.dto.StateDto;
 import be.jeffcheasey88.codetaskfollower.mapper.StateMapper;
 import be.jeffcheasey88.codetaskfollower.model.State;
 import be.jeffcheasey88.codetaskfollower.repository.StateRepository;
-import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
 import dev.peerat.framework.Locker;
 import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
@@ -38,14 +38,14 @@ public class StateController {
 	@Route(path = "/states/(\\d+)", type = PUT, needLogin = true)
 	public void editState(StateDto stateDto, @Argument State state){
 		stateMapper.fullCopyDtoToModel(stateDto, state);
-		TemporalRepository.INSTANCE.updateState(state);
+		updateState(state);
 		modelLocker.pushValue(new ModelUpdateDto(stateMapper.toDto(state), "update"));
 	}
 	
 	@Route(path = "/states/(\\d+)", type = PATCH, needLogin = true)
 	public void editPartialState(StateDto stateDto, @Argument State state){
 		stateMapper.safeCopyDtoToModel(stateDto, state);
-		TemporalRepository.INSTANCE.updateState(state);
+		updateState(state);
 		modelLocker.pushValue(new ModelUpdateDto(stateMapper.toDto(state), "update"));
 	}
 	

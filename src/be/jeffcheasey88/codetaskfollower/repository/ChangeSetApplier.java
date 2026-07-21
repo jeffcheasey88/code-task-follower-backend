@@ -48,7 +48,7 @@ public class ChangeSetApplier{
 		
 		List<Integer> lastIndex = null;
 		try{
-			lastIndex = TemporalRepository.INSTANCE.externalSelectRequest("SELECT indexNumber FROM ctf_change_set", r -> {
+			lastIndex = TemporalRepository.INSTANCE.selectRequest("SELECT indexNumber FROM ctf_change_set", r -> {
 				try {
 					return r.getInt("indexNumber");
 				} catch (SQLException e) {}
@@ -58,10 +58,10 @@ public class ChangeSetApplier{
 		
 		int currentIndex = -1000;
 		if(lastIndex == null || lastIndex.isEmpty() || lastIndex.get(0) == null){
-			TemporalRepository.INSTANCE.externalUpdateRequest(
+			TemporalRepository.INSTANCE.updateRequest(
 					"CREATE TABLE ctf_change_set(id INTEGER PRIMARY KEY, indexNumber INTEGER);"
 					);
-			TemporalRepository.INSTANCE.externalUpdateRequest(
+			TemporalRepository.INSTANCE.updateRequest(
 					"INSERT INTO ctf_change_set (id, indexNumber) VALUES (?,?);",
 					new SqlParam("int", 0),
 					new SqlParam("int", -1000)
@@ -80,7 +80,7 @@ public class ChangeSetApplier{
 			System.out.println("Updating to changeset "+updatedIndex);
 		}
 		if(updatedIndex > currentIndex){
-			TemporalRepository.INSTANCE.externalUpdateRequest(
+			TemporalRepository.INSTANCE.updateRequest(
 					"UPDATE ctf_change_set SET indexNumber = ? WHERE id = ?",
 					new SqlParam("int", updatedIndex),
 					new SqlParam("int", 0)
@@ -145,7 +145,7 @@ public class ChangeSetApplier{
 					String[] queries = changeset.query.replace("\t", "").split("\\;\\s+");
 					for(String query : queries){
 						query = query.replace("\n", "");
-						TemporalRepository.INSTANCE.externalUpdateRequest(query);
+						TemporalRepository.INSTANCE.updateRequest(query);
 					}
 				}
 				@Override
@@ -168,8 +168,8 @@ public class ChangeSetApplier{
 					base.apply();
 					String[] queries = changeset.query.replace("\t", "").split("\\;\\s+");
 					for(String query : queries){
-						query = query.replace("\n", "");
-						TemporalRepository.INSTANCE.externalUpdateRequest(query);
+						query = query.replace("\n", " ");
+						TemporalRepository.INSTANCE.updateRequest(query);
 					}
 				}
 				@Override

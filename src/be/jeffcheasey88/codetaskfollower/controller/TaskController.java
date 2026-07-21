@@ -1,5 +1,6 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
+import static be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository.*;
 import static be.jeffcheasey88.codetaskfollower.tmp.Permission.canAccess;
 import static dev.peerat.framework.RequestType.DELETE;
 import static dev.peerat.framework.RequestType.PATCH;
@@ -56,7 +57,7 @@ public class TaskController{
 	public int createTask(User user, TaskDto taskDto){
 		Task task = new Task(0, taskDto.name(), taskDto.description(), 0, null, null, null, null, null, null);
 		Permission.giveAccess("Task", task.getId(), "player", user.getId(), Permission.PERM_ADMIN);
-		TemporalRepository.INSTANCE.updateTaskState(task.getId(), taskDto.stateId());
+		updateTaskState(task.getId(), taskDto.stateId());
 		modelLocker.pushValue(new ModelUpdateDto(task, "create"));
 		return task.getId();
 	}
@@ -65,7 +66,7 @@ public class TaskController{
 	public void editTask(User user, TaskDto taskDto, @Argument Task task){
 		if(!canUpdateTask(user, task.getId())) throw new HttpError(403);
         taskMapper.fullCopyDtoToModel(taskDto, task);
-        TemporalRepository.INSTANCE.updateTask(task);
+        updateTask(task);
         modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "update"));
 	}
 	
@@ -73,15 +74,15 @@ public class TaskController{
 	public void editPartialTask(User user, TaskDto taskDto, @Argument Task task){
 		if(!canUpdateTask(user, task.getId())) throw new HttpError(403);
 		taskMapper.safeCopyDtoToModel(taskDto, task);
-		TemporalRepository.INSTANCE.updateTask(task);
+		updateTask(task);
 		modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "update"));
 	}
 	
 	@Route(path = "/tasks/(\\d+)", type = DELETE, needLogin = true)
 	public void deleteTask(User user, @Argument Task task) {
 		if(!canDeleteTask(user, task.getId())) throw new HttpError(403);
-		TemporalRepository.INSTANCE.removeTaskAnyProject(task.getId());
-		TemporalRepository.INSTANCE.removeTaskAnyTag(task.getId());
+		removeTaskAnyProject(task.getId());
+		removeTaskAnyTag(task.getId());
 		TreasureCache.delete(task);
 		modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "delete"));
 	}
@@ -89,14 +90,14 @@ public class TaskController{
 	@Route(path = "/tasks/(\\d+)/tag/(\\d+)", type = PUT, needLogin = true)
 	public void addTaskTag(User user, @Argument Task task, @Argument(2) Tag tag){
 		if(!canAddElementTask(user, task.getId())) throw new HttpError(403);
-        TemporalRepository.INSTANCE.insertTaskTag(task, tag);
+        insertTaskTag(task, tag);
         modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "update"));
 	}
 	
 	@Route(path = "/tasks/(\\d+)/tag/(\\d+)", type = DELETE, needLogin = true)
-	public void removeTaskTag(User user, @Argument Task task, @Argument(2) Tag tag){
+	public void removeTaskTags(User user, @Argument Task task, @Argument(2) Tag tag){
 		if(!canAddElementTask(user, task.getId())) throw new HttpError(403);
-        TemporalRepository.INSTANCE.removeTaskTag(task, tag);
+        removeTaskTag(task, tag);
         modelLocker.pushValue(new ModelUpdateDto(taskMapper.toDto(task), "update"));
 	}
 	
@@ -108,14 +109,14 @@ public class TaskController{
 	}
 	
 	public List<TagDto> getTags(int taskId){
-		return tagMapper.toDto(TemporalRepository.INSTANCE.selectTags(taskId));
+		return tagMapper.toDto(selectTags(taskId));
 	}
 	
 	@Route(path = "/tasks/(\\d+)/state/(\\d+)", type = PUT, needLogin = true)
-	public void updateTaskState(User user, Matcher matcher){
+	public void updateTaskStates(User user, Matcher matcher){
 		int taskId = Integer.parseInt(matcher.group(1));
 		if(!canUpdateTask(user, taskId)) throw new HttpError(403);
-        TemporalRepository.INSTANCE.updateTaskState(taskId, Integer.parseInt(matcher.group(2)));
+        updateTaskState(taskId, Integer.parseInt(matcher.group(2)));
 	}
 	
 	public static boolean canReadTask(User user, int taskId){

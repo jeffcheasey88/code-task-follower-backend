@@ -38,7 +38,7 @@ public class PermissionChangeSet implements LogicalChangeSet{
 		List<Task> tasks = TreasureCache.<Task>selectAll().toList();
 		for(Player player : players){
 			for(Project project : projects){
-				TemporalRepository.INSTANCE.externalUpdateRequest(
+				TemporalRepository.INSTANCE.updateRequest(
 						"INSERT INTO ProjectAccess(roleType, roleId, projectId, accessLevel) VALUES (?,?,?,?)",
 						new SqlParam("String","player"),
 						new SqlParam("int",player.getId()),
@@ -47,7 +47,7 @@ public class PermissionChangeSet implements LogicalChangeSet{
 					);
 			}
 			for(Task task : tasks){
-				TemporalRepository.INSTANCE.externalUpdateRequest(
+				TemporalRepository.INSTANCE.updateRequest(
 						"INSERT INTO TaskAccess(roleType, roleId, taskId, accessLevel) VALUES (?,?,?,?)",
 						new SqlParam("String","player"),
 						new SqlParam("int",player.getId()),

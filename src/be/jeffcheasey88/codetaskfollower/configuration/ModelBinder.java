@@ -16,12 +16,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import be.jeffcheasey88.codetaskfollower.configuration.Authenticator.User;
 import be.jeffcheasey88.codetaskfollower.exception.HttpError;
 import be.jeffcheasey88.codetaskfollower.repository.Repository;
 import dev.peerat.framework.Context;
 import dev.peerat.framework.HttpReader;
 import dev.peerat.framework.HttpWriter;
+import dev.peerat.framework.auth.User;
 import dev.peerat.framework.dependency.DependencyInjector;
 import dev.peerat.framework.json.JsonArray;
 import dev.peerat.framework.json.JsonMap;
@@ -39,7 +39,7 @@ public class ModelBinder implements ExecutableProvider{
 	@Override
 	public void provide(Matcher matcher, Context context, HttpReader reader, HttpWriter writer, Method method, Parameter[] parameters) throws Exception{
 		for(Parameter parameter : parameters){
-			if(parameter.getType().equals(User.class)) parameter.setValue(context.getUser());
+			if(User.class.isAssignableFrom(parameter.getType())) parameter.setValue(context.getUser());
 			else if(parameter.getType().getPackage().getName().contains("codetaskfollower.dto")){
 				parameter.setValue(toDto(reader.readJson(), parameter.getType()));
 			}else{

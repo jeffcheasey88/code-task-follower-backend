@@ -1,5 +1,6 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
+import static be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository.*;
 import static be.jeffcheasey88.codetaskfollower.tmp.Permission.*;
 
 import static dev.peerat.framework.RequestType.DELETE;
@@ -28,7 +29,6 @@ import be.jeffcheasey88.codetaskfollower.model.Tag;
 import be.jeffcheasey88.codetaskfollower.repository.ProjectRepository;
 import be.jeffcheasey88.codetaskfollower.repository.StateRepository;
 import be.jeffcheasey88.codetaskfollower.tmp.Permission;
-import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
 import dev.peerat.framework.Locker;
 import dev.peerat.framework.dependency.Injection;
 import dev.peerat.framework.routes.Route;
@@ -76,7 +76,7 @@ public class ProjectController {
 		project.setName(projectDto.name());
 		project.setColor(projectDto.color());
 		project.setDescription(projectDto.description());
-		TemporalRepository.INSTANCE.updateProject(project);
+		updateProject(project);
 		modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "update"));
 	}
 	
@@ -86,7 +86,7 @@ public class ProjectController {
 		if(projectDto.name() != null) project.setName(projectDto.name());
 		if(projectDto.color() != null) project.setColor(projectDto.color());
 		if(projectDto.description() != null) project.setDescription(projectDto.description());
-		TemporalRepository.INSTANCE.updateProject(project);
+		updateProject(project);
 		modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "update"));
 	}
 	
@@ -100,7 +100,8 @@ public class ProjectController {
 	@Route(path = "/projects/(\\d+)/state/(\\d+)", type = PUT, needLogin = true)
 	public void addProjectState(User user, @Argument Project project, @Argument(2) State state){
 		if(!canUpdateProject(user, project.getId()))  throw new HttpError(403);
-        TemporalRepository.INSTANCE.insertProjectStates(project, state);
+		State copy = new State(0, state.getName(), state.getColor());
+        insertProjectStates(project, copy);
         modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "update"));
 	}
 
@@ -108,14 +109,15 @@ public class ProjectController {
 	public void addProjectTask(User user, Matcher matcher){
 		int projectId = Integer.parseInt(matcher.group(1));
 		if(!canAddElementProject(user, projectId))  throw new HttpError(403);
-        TemporalRepository.INSTANCE.insertProjectTasks(projectId, Integer.parseInt(matcher.group(2)));
+        insertTaskProject(projectId, Integer.parseInt(matcher.group(2)));
 	}
 	
 	@Route(path = "/projects/(\\d+)/state/(\\d+)", type = DELETE, needLogin = true)
 	public void removeProjectState(User user, @Argument Project project, @Argument(2) State state){
 		if(!canUpdateProject(user, project.getId()))  throw new HttpError(403);
-        TemporalRepository.INSTANCE.removeProjectStates(project, state);
-        modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "delete"));
+        removeProjectStates(project, state);
+        TreasureCache.delete(state);
+        modelLocker.pushValue(new ModelUpdateDto(projectMapper.toDto(project), "update"));
 	}
 	
 	@Route(path = "/projects/(\\d+)/states", needLogin = true)
@@ -126,15 +128,15 @@ public class ProjectController {
 	}
 	
 	public List<StateDto> getStates(int projectId){
-		return stateMapper.toDto(TemporalRepository.INSTANCE.selectStates(projectId));
+		return stateMapper.toDto(selectStates(projectId));
 	}
 
 	public List<TaskDto> getTasks(int projectId){
-		return taskMapper.toDto(TemporalRepository.INSTANCE.selectTasks(projectId)).stream().map(t -> {
-			List<Tag> tags = TemporalRepository.INSTANCE.selectTags(t.id());
+		return taskMapper.toDto(selectTasks(projectId)).stream().map(t -> {
+			List<Tag> tags = selectTags(t.id());
 			List<Integer> tagIds = tags.stream().map(dto -> dto.getId()).toList();
 			
-			return new TaskDto(t.id(), t.name(), t.description(), t.estimateSeconds(), stateMapper.toDto(TemporalRepository.INSTANCE.selectStateForTask(t.id())).getId(), tagIds, null, null, null, null, null);
+			return new TaskDto(t.id(), t.name(), t.description(), t.estimateSeconds(), stateMapper.toDto(selectStateForTask(t.id())).getId(), tagIds, null, null, null, null, null);
 		}).toList();
 	}
 	
