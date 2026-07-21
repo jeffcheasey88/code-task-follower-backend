@@ -34,7 +34,7 @@ import dev.peerat.framework.dependency.DependencyInjector;
 import dev.peerat.framework.routes.RouteState;
 import dev.peerat.mapping.Ship;
 import dev.peerat.mapping.TreasureCache;
-import dev.peerat.mapping.providers.mysql.MySQLCompass;
+import dev.peerat.mapping.providers.postgresql.PostgreSQLCompass;
 
 public class Main{
 	
@@ -47,7 +47,7 @@ public class Main{
 	public static void main(String[] args) throws Exception{
 		final Configuration config = loadConfig(args);
 		
-		Ship ship = new Ship("mysql", new MySQLCompass(config.getDatabaseHost(), config.getDatabasePort(), config.getDatabaseName(), config.getDatabaseUser(), config.getDatabasePassword()), new DatabaseConfiguration());
+		Ship ship = new Ship("postgresql", new PostgreSQLCompass(config.getDatabaseHost(), config.getDatabasePort(), config.getDatabaseName(), config.getDatabaseUser(), config.getDatabasePassword()), new DatabaseConfiguration());
 		ship.setSails();
 		TemporalRepository.INSTANCE.connector(ship); //TODO remove
 		

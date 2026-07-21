@@ -7,13 +7,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
-import dev.peerat.mapping.CursedTreasureException;
-import dev.peerat.mapping.Ship;
-import dev.peerat.mapping.ShipwreckException;
-import dev.peerat.mapping.providers.mysql.MySQLCompass;
 import be.jeffcheasey88.codetaskfollower.model.Branch;
 import be.jeffcheasey88.codetaskfollower.model.Code;
 import be.jeffcheasey88.codetaskfollower.model.Commit;
@@ -21,19 +16,23 @@ import be.jeffcheasey88.codetaskfollower.model.Project;
 import be.jeffcheasey88.codetaskfollower.model.State;
 import be.jeffcheasey88.codetaskfollower.model.Tag;
 import be.jeffcheasey88.codetaskfollower.model.Task;
+import dev.peerat.mapping.CursedTreasureException;
+import dev.peerat.mapping.Ship;
+import dev.peerat.mapping.ShipwreckException;
+import dev.peerat.mapping.providers.postgresql.PostgreSQLCompass;
 
 public class TemporalRepository{
 	
 	public static TemporalRepository INSTANCE = new TemporalRepository();
 	private Connection con;
-	private MySQLCompass compass;
+	private PostgreSQLCompass compass;
 	
 	public void connector(Ship ship){
-		this.compass = ((MySQLCompass)ship.getCompass());
+		this.compass = ((PostgreSQLCompass)ship.getCompass());
 	}
 	private void ensureConnection(){
 		try{
-			if(con == null || !(con.isValid(5))) this.con = DriverManager.getConnection("jdbc:mysql://" + compass.getHost() + ":" + compass.getPort() + "/" + compass.getDatabase(), compass.getUser(), compass.getPassword());
+			if(con == null || !(con.isValid(5))) this.con = DriverManager.getConnection("jdbc:postgresql://" + compass.getHost() + ":" + compass.getPort() + "/" + compass.getDatabase(), compass.getUser(), compass.getPassword());
 		}catch(Exception e){
 			throw new ShipwreckException("The ship couldn't set sail", e);
 		}

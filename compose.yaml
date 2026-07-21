@@ -1,21 +1,22 @@
 services:
   database:
-    image: mysql:9.7.1
+    image: postgres:17
     container_name: ctf-database
     environment:
-      MYSQL_DATABASE: code-task-follower
-      MYSQL_ROOT_PASSWORD: root
+      POSTGRES_DB: code-task-follower
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot"]
+      test: ["CMD-SHELL", "pg_isready -U root -d code-task-follower"]
       interval: 1s
       timeout: 3s
       retries: 20
       start_period: 1s
     ports:
-      - ":3306"
+      - ":5432"
     volumes:
-      - database-data:/var/lib/mysql
-      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+      - database-data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
     networks:
       - ctf-network
 

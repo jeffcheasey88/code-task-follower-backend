@@ -2,9 +2,9 @@ package be.jeffcheasey88.codetaskfollower.configuration;
 
 import be.jeffcheasey88.codetaskfollower.model.Project;
 import be.jeffcheasey88.codetaskfollower.model.Task;
-import dev.peerat.mapping.providers.mysql.MySQLMap;
+import dev.peerat.mapping.providers.postgresql.PostgreSQLMap;
 
-public class DatabaseConfiguration extends MySQLMap{
+public class DatabaseConfiguration extends PostgreSQLMap{
 	
 	public DatabaseConfiguration(){
 		link(javaClazz->javaClazz.toLowerCase()+"s");

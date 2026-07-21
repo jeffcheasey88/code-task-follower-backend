@@ -1,12 +1,12 @@
 CREATE TABLE projects(
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name varchar(255) NOT NULL,
     color varchar(255),
     description text
 );
 
 CREATE TABLE states(
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name varchar(255) NOT NULL,
     color varchar(255)
 );
@@ -20,7 +20,7 @@ CREATE TABLE ProjectStates(
 );
 
 CREATE TABLE tasks(
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name varchar(255) NOT NULL,
     stateId INTEGER,
     estimateSeconds INTEGER,
@@ -37,7 +37,7 @@ CREATE TABLE TaskProject(
 );
 
 CREATE TABLE commits(
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     hash varchar(255) NOT NULL
 );
 
@@ -50,14 +50,14 @@ CREATE TABLE CommitTask(
 );
 
 CREATE TABLE chronometers(
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     seconds INTEGER,
     taskId INTEGER,
     CONSTRAINT fk_chronometer_task FOREIGN KEY (taskId) REFERENCES tasks(id)
 );
 
 CREATE TABLE chronometerparts(
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     seconds INTEGER,
     description varchar(255),
     chronometerId INTEGER,
@@ -65,7 +65,7 @@ CREATE TABLE chronometerparts(
 );
 
 CREATE TABLE branches(
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     repositoryName varchar(255) NOT NULL,
     branchName varchar(255)
 );
@@ -87,7 +87,7 @@ CREATE TABLE ProjectBranch(
 );
 
 CREATE TABLE tags(
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name varchar(255) NOT NULL,
     color varchar(255)
 );
@@ -101,7 +101,7 @@ CREATE TABLE TaskTag(
 );
 
 CREATE TABLE codes(
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     branch INTEGER,
     classPath varchar(255),
     CONSTRAINT fk_code_branch FOREIGN KEY (branch) REFERENCES branches(id)
@@ -116,22 +116,15 @@ CREATE TABLE TaskCode(
 );
 
 CREATE TABLE features(
-	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	name varchar(255) NOT NULL,
 	description varchar(255),
 	version INTEGER
 );
 
 CREATE TABLE players(
-	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	username varchar(255) NOT NULL,
 	password varchar(255) NOT NULL,
 	isAdmin boolean
 );
-
-CREATE TABLE player_permissions(
-	playerId INTEGER,
-	permissionName VARCHAR(50),
-	PRIMARY KEY (playerId, permissionName),
-    CONSTRAINT fk_player_permission FOREIGN KEY (playerId) REFERENCES players(id)
-)
