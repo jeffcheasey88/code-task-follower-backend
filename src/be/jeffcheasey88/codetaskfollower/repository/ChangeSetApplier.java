@@ -19,7 +19,7 @@ public class ChangeSetApplier{
 	
 	public ChangeSetApplier(String folderPath){
 		this.folderPath = folderPath;
-		this.changes = new TreeSet<>((a,b) -> (a.getIndexNumber() < b.getIndexNumber()) ? 1 : (a.getIndexNumber() > b.getIndexNumber()) ? -1 : 0);
+		this.changes = new TreeSet<>((a,b) -> (a.getIndexNumber() < b.getIndexNumber()) ? -1 : (a.getIndexNumber() > b.getIndexNumber()) ? 1 : 0);
 	}
 	
 	public void addChangeSet(LogicalChangeSet changeset){
