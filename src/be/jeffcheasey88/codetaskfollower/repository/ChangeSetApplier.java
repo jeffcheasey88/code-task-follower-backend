@@ -1,15 +1,18 @@
 package be.jeffcheasey88.codetaskfollower.repository;
 
+import static be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository.insert;
+import static be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository.param;
+import static be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository.select;
+import static be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository.update;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository;
-import be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository.SqlParam;
 import dev.peerat.mapping.CursedTreasureException;
 
 public class ChangeSetApplier{
@@ -45,29 +48,14 @@ public class ChangeSetApplier{
 			}
 		}
 		
-		
-		List<Integer> lastIndex = null;
+		int currentIndex;
 		try{
-			lastIndex = TemporalRepository.INSTANCE.selectRequest("SELECT indexNumber FROM ctf_change_set", r -> {
-				try {
-					return r.getInt("indexNumber");
-				} catch (SQLException e) {}
-				return null;
-			});
-		}catch(CursedTreasureException exception){}
-		
-		int currentIndex = -1000;
-		if(lastIndex == null || lastIndex.isEmpty() || lastIndex.get(0) == null){
+			currentIndex = select("SELECT indexNumber FROM ctf_change_set", r->r.getInt("indexNumber"));
+		}catch(CursedTreasureException ex){
 			TemporalRepository.INSTANCE.updateRequest(
 					"CREATE TABLE ctf_change_set(id INTEGER PRIMARY KEY, indexNumber INTEGER);"
 					);
-			TemporalRepository.INSTANCE.updateRequest(
-					"INSERT INTO ctf_change_set (id, indexNumber) VALUES (?,?);",
-					new SqlParam("int", 0),
-					new SqlParam("int", -1000)
-					);
-		}else{
-			currentIndex = lastIndex.get(0);
+			insert("ctf_change_set", List.of("id", "indexNumber"), param(0), param(currentIndex = -1000));
 		}
 		
 		int updatedIndex = currentIndex;
@@ -80,11 +68,7 @@ public class ChangeSetApplier{
 			System.out.println("Updating to changeset "+updatedIndex);
 		}
 		if(updatedIndex > currentIndex){
-			TemporalRepository.INSTANCE.updateRequest(
-					"UPDATE ctf_change_set SET indexNumber = ? WHERE id = ?",
-					new SqlParam("int", updatedIndex),
-					new SqlParam("int", 0)
-					);
+			update("ctf_change_set", List.of("indexNumber"), List.of("id"), param(updatedIndex), param(0));
 		}else{
 			System.out.println("no changeset to upgrade");
 		}
