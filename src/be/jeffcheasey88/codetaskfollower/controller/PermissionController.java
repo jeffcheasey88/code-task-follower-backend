@@ -1,7 +1,9 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
-import static be.jeffcheasey88.codetaskfollower.tmp.Permission.*;
-import static dev.peerat.framework.RequestType.*;
+import static be.jeffcheasey88.codetaskfollower.tmp.Permission.canAccess;
+import static dev.peerat.framework.RequestType.DELETE;
+import static dev.peerat.framework.RequestType.POST;
+import static dev.peerat.framework.RequestType.PUT;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -9,9 +11,11 @@ import java.util.regex.Matcher;
 
 import be.jeffcheasey88.codetaskfollower.configuration.Authenticator.User;
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Argument;
+import be.jeffcheasey88.codetaskfollower.dto.PlayerDto;
 import be.jeffcheasey88.codetaskfollower.exception.HttpError;
 import be.jeffcheasey88.codetaskfollower.model.Player;
 import be.jeffcheasey88.codetaskfollower.tmp.Permission;
+import dev.peerat.framework.RequestType;
 import dev.peerat.framework.data.QueryParameters;
 import dev.peerat.framework.routes.Route;
 import dev.peerat.mapping.TreasureCache;
@@ -62,17 +66,27 @@ public class PermissionController{
 	record PlayerPermissionDto(int playerId, boolean add, boolean update, boolean delete, boolean admin){}
 
 	@Route(path="/players", needLogin = true)
-	public List<String> getPlayers(){
-		return getAllPlayers().stream().map(Player::getUsername).toList();
+	public List<PlayerDto> getPlayers(User user) {
+		return getAllPlayers().stream().map(player -> new PlayerDto(player.getId(), player.getUsername(), user.isAdmin() && player.getIsAdmin())).toList();
 	}
 	
 	@Route(path="/players"+QueryParameters.QUERY_REGEX, needLogin = true)
-	public List<String> getPlayersByName(Matcher matcher) throws UnsupportedEncodingException{
+	public List<PlayerDto> getPlayersByName(Matcher matcher, User user) throws UnsupportedEncodingException{
 		QueryParameters parameters = new QueryParameters(matcher.group(1));
 		String nameQuery = parameters.getValue("name");
 		if(nameQuery == null) throw new HttpError(400);
 		String query = nameQuery.toLowerCase();
-		return getAllPlayers().stream().map(Player::getUsername).filter(name -> name.toLowerCase().contains(query)).toList();
+		return getAllPlayers().stream().map(player -> new PlayerDto(player.getId(), player.getUsername(), user.isAdmin() && player.getIsAdmin())).filter(userDto -> userDto.username().toLowerCase().contains(query)).toList();
+	}
+
+	@Route(path="/players/(\\d+)", needLogin = true, type = RequestType.PATCH)
+	public void updatePlayer(User user, PlayerDto playerDto, @Argument int id) {
+		if(!user.isAdmin()) throw new HttpError(403);
+
+		if (playerDto.isAdmin() == null) return;
+
+		Player player = getPlayer(id);
+		player.setIsAdmin(playerDto.isAdmin());
 	}
 	
 	@Route(path = "/players/(\\d+)", needLogin = true)
@@ -205,8 +219,11 @@ public class PermissionController{
 	}
 	
 	private String getUsername(int playerId){
-		Player result = TreasureCache.<Player>selectAll().filter(player->player.getId() == playerId).get();
-		return result.getUsername();
+		return getPlayer(playerId).getUsername();
+	}
+
+	private Player getPlayer(int playerId){
+		return TreasureCache.<Player>selectAll().filter(player->player.getId() == playerId).get();
 	}
 	
 	private int toAccess(PlayerPermissionDto permissionDto){

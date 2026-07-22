@@ -41,4 +41,8 @@ public class Player{
 	public void setPassword(String password){
 		this.password = password;
 	}
+
+	public void setIsAdmin(boolean isAdmin) {
+		this.isAdmin = isAdmin;
+	}
 }

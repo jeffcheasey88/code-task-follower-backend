@@ -40,12 +40,12 @@ public class ModelBinder implements ExecutableProvider{
 	public void provide(Matcher matcher, Context context, HttpReader reader, HttpWriter writer, Method method, Parameter[] parameters) throws Exception{
 		for(Parameter parameter : parameters){
 			if(User.class.isAssignableFrom(parameter.getType())) parameter.setValue(context.getUser());
-			else if(parameter.getType().getPackage().getName().contains("codetaskfollower.dto") || parameter.getType().getSimpleName().toLowerCase().endsWith("dto")){
+			else if(parameter.getType().getPackage() != null && parameter.getType().getPackage().getName().contains("codetaskfollower.dto") || parameter.getType().getSimpleName().toLowerCase().endsWith("dto")){
 				parameter.setValue(toDto(reader.readJson(), parameter.getType()));
 			}else{
 				Argument key = parameter.getAnnotation(Argument.class);
 				if(key != null){
-					if(parameter.getType().getPackage().getName().endsWith("codetaskfollower.model")){
+					if(parameter.getType().getPackage() != null && parameter.getType().getPackage().getName().endsWith("codetaskfollower.model")){
 						Repository<Object,Object> repository = (Repository<Object, Object>) this.dependencies.find(null, Class.forName("be.jeffcheasey88.codetaskfollower.repository." + parameter.getType().getSimpleName() + "Repository"), null);
 						Object model = repository.findById(repository.parseKey(matcher.group(key.value())));
 						if(model == null) throw new HttpError(404);
