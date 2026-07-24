@@ -11,6 +11,7 @@ public class ChronometerMapper extends Mapper<ChronometerDto, ChronometerDto, Ch
 	
 	@Override
 	public ChronometerDto toDto(Chronometer model) {
+		if (model == null) return null;
 		return new ChronometerDto(model.getId(), model.getSeconds(), chronometerPartMapper.toDto(model.getParts()));
 	}
 

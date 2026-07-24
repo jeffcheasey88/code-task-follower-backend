@@ -6,6 +6,8 @@ import static dev.peerat.framework.RequestType.DELETE;
 import static dev.peerat.framework.RequestType.POST;
 import static dev.peerat.framework.RequestType.PUT;
 
+import java.util.List;
+
 import be.jeffcheasey88.codetaskfollower.configuration.Authenticator.User;
 import be.jeffcheasey88.codetaskfollower.configuration.ModelBinder.Argument;
 import be.jeffcheasey88.codetaskfollower.dto.ChronometerDto;
@@ -31,21 +33,23 @@ public class ChronometerController{
 	@Injection private ChronometerMapper chronometerMapper;
 	@Injection private ChronometerPartMapper chronometerPartMapper;
 
-	@Route(path = "chronometer/(\\d+)", type = POST, needLogin = true)
-	public int createChornometer(User user, @Argument Task task){
+	@Route(path = "/chronometer/(\\d+)", type = POST, needLogin = true)
+	public int createChronometer(User user, @Argument Task task){
 		if(!TaskController.canAddElementTask(user, task.getId())) throw new HttpError(403);
 		Chronometer chronometer = new Chronometer(0, 0, task.getId(), null);
 		updateChronometerTask(chronometer.getId(), task.getId());
 		return chronometer.getId();
 	}
 	
-	@Route(path = "chronometer/(\\d+)", needLogin = true)
+	@Route(path = "/chronometer/(\\d+)", needLogin = true)
 	public ChronometerDto getChronometer(User user, @Argument Task task){
 		if(!TaskController.canAddElementTask(user, task.getId())) throw new HttpError(403);
-		return chronometerMapper.toDto(getChronometer(task.getId()));
+		
+		Chronometer chronometer = getChronometer(task.getId());
+		return new ChronometerDto(chronometer.getId(), chronometer.getSeconds(), chronometerPartMapper.toDto(getChronometerParts(chronometer.getId())));
 	}
 	
-	@Route(path = "chronometer/(\\d+)/part", type = POST, needLogin = true)
+	@Route(path = "/chronometer/(\\d+)/part", type = POST, needLogin = true)
 	public int createChronometerPart(User user, @Argument Task task){
 		if(!TaskController.canAddElementTask(user, task.getId())) throw new HttpError(403);
 		Chronometer chronometer = getChronometer(task.getId());
@@ -54,20 +58,28 @@ public class ChronometerController{
 		return chronometerPart.getId();
 	}
 	
-	@Route(path = "chronometer/(\\d+)/part/(\\d+)", type = PUT, needLogin = true)
+	@Route(path = "/chronometer/(\\d+)/part/(\\d+)", type = PUT, needLogin = true)
 	public void editPart(User user, @Argument Task task, @Argument(2) ChronometerPart chronometerPart, ChronometerPartDto partDto){
 		if(!TaskController.canAddElementTask(user, task.getId())) throw new HttpError(403);
+
+		int secondsDifference = partDto.getSeconds() - chronometerPart.getSeconds();
+		Chronometer chronometer = getChronometer(task.getId());
+		chronometer.setSeconds(chronometer.getSeconds() + secondsDifference);
+
 		chronometerPartMapper.fullCopyDtoToModel(partDto, chronometerPart);
 		updateChronometerPart(chronometerPart);
 	}
 	
-	@Route(path = "chronometer/(\\d+)/part/(\\d+)", type = DELETE, needLogin = true)
+	@Route(path = "/chronometer/(\\d+)/part/(\\d+)", type = DELETE, needLogin = true)
 	public void deletePart(User user, @Argument Task task, @Argument(2) ChronometerPart chronometerPart){
 		if(!TaskController.canAddElementTask(user, task.getId())) throw new HttpError(403);
+		
+		Chronometer chronometer = getChronometer(task.getId());
+		chronometer.setSeconds(chronometer.getSeconds() - chronometerPart.getSeconds());
 		TreasureCache.delete(chronometerPart);
 	}
 	
-	@Route(path = "chronometer/(\\d+)/part/(\\d+)/takeTiming", type = POST, needLogin = true)
+	@Route(path = "/chronometer/(\\d+)/part/(\\d+)/takeTiming", type = POST, needLogin = true)
 	public ChronometerPartDto takeTiming(User user, @Argument Task task, @Argument(2) ChronometerPart chronometerPart){
 		if(!TaskController.canAddElementTask(user, task.getId())) throw new HttpError(403);
 		return null;
@@ -75,5 +87,9 @@ public class ChronometerController{
 	
 	public Chronometer getChronometer(int taskId){
 		return TreasureCache.<Chronometer>selectAll().filter(chrono -> chrono.getTaskId() == taskId).get();
+	}
+
+	public List<ChronometerPart> getChronometerParts(int chronometerId){
+		return TreasureCache.<ChronometerPart>selectAll().filter(chronoPart -> chronoPart.getChronometerId() == chronometerId).toList();
 	}
 }
