@@ -2,12 +2,16 @@ package be.jeffcheasey88.codetaskfollower.repository.changeset;
 
 import static be.jeffcheasey88.codetaskfollower.tmp.TemporalRepository.*;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import be.jeffcheasey88.codetaskfollower.model.Project;
 import be.jeffcheasey88.codetaskfollower.model.State;
+import be.jeffcheasey88.codetaskfollower.model.Task;
 import be.jeffcheasey88.codetaskfollower.repository.ChangeSetApplier;
 import be.jeffcheasey88.codetaskfollower.repository.ChangeSetApplier.LogicalChangeSet;
 import dev.peerat.framework.dependency.Injection;
@@ -34,12 +38,26 @@ public class StateChangeSet implements LogicalChangeSet{
 		List<Project> projects = TreasureCache.<Project>selectAll().toList();
 		for(Project project : projects){
 			List<State> projectStates = selectStates(project.getId());
+			
+			Map<Integer, List<Task>> taskStates = new HashMap<>();
+			for(Task task : selectTasks(project.getId())){
+				State state = selectStateForTask(task.getId());
+				taskStates.computeIfAbsent(state.getId(), key -> new LinkedList<>()).add(task);
+			}
+			
 			for(State state : projectStates){
 				if(states.add(state.getId())) continue;
 				removeProjectStates(project, state);
 				State copy = new State(0, state.getName(), state.getColor());
 				insertProjectStates(project, copy);
 				states.add(copy.getId());
+				
+				List<Task> tasks = taskStates.get(state.getId());
+				if(tasks != null){
+					for(Task task : tasks){
+						updateTaskState(task.getId(), copy.getId());
+					}
+				}
 			}
 		}
 	}
