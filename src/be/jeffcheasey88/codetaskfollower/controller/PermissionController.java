@@ -165,7 +165,7 @@ public class PermissionController{
 		if(!TaskController.canAdminTask(user, taskId)) throw new HttpError(403);
 		return Permission.getEntityPermissions("player", "task", taskId).stream().map(perm -> {
 			return new PlayerPermission(
-					perm.entityId(),
+					perm.roleId(),
 					getUsername(perm.roleId()),
 					true,
 					canAccess(perm.accessLevel(), Permission.PERM_ADD),
