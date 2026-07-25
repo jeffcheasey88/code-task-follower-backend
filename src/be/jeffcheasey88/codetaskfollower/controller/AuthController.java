@@ -8,6 +8,7 @@ import be.jeffcheasey88.codetaskfollower.configuration.Authenticator.User;
 import be.jeffcheasey88.codetaskfollower.configuration.Configuration;
 import be.jeffcheasey88.codetaskfollower.dto.AuthDto;
 import be.jeffcheasey88.codetaskfollower.dto.UpdatePasswordDto;
+import be.jeffcheasey88.codetaskfollower.exception.HttpError;
 import be.jeffcheasey88.codetaskfollower.model.Player;
 import dev.peerat.framework.Context;
 import dev.peerat.framework.Router;
@@ -60,10 +61,7 @@ public class AuthController{
 	@Route(path = "/users/changepw", type = PATCH, needLogin = true)
 	public void changePassword(User user, UpdatePasswordDto updatePasswordDto) throws Exception{
 		Player player = getPlayer(user.getName());
-		if(Password.check(updatePasswordDto.oldPassword(), player.getPassword()).withArgon2()){
-			player.setPassword(Password.hash(updatePasswordDto.newPassword()).withArgon2().getResult());
-		}else{
-			throw new NullPointerException();
-		}
+		if(!Password.check(updatePasswordDto.oldPassword(), player.getPassword()).withArgon2()) throw new HttpError(400);
+		player.setPassword(Password.hash(updatePasswordDto.newPassword()).withArgon2().getResult());
 	}
 }
