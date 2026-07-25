@@ -67,7 +67,7 @@ public class PermissionController{
 		return getAllPlayers().stream().map(player -> new PlayerDto(player.getId(), player.getUsername(), user.isAdmin() && player.getIsAdmin())).toList();
 	}
 	
-	@Route(path="/players"+QueryParameters.QUERY_REGEX, needLogin = true)
+	@Route(path="/players/search"+QueryParameters.QUERY_REGEX, needLogin = true)
 	public List<PlayerDto> getPlayersByName(Matcher matcher, User user) throws UnsupportedEncodingException{
 		QueryParameters parameters = new QueryParameters(matcher.group(1));
 		String nameQuery = parameters.getValue("name");
@@ -108,7 +108,7 @@ public class PermissionController{
 		if(!ProjectController.canAdminProject(user, projectId)) throw new HttpError(403);
 		return Permission.getEntityPermissions("player", "project", projectId).stream().map(perm -> {
 			return new PlayerPermissionDto(
-					perm.entityId(),
+					perm.roleId(),
 					getUsername(perm.roleId()),
 					isReadOnly(perm.accessLevel()),
 					canAccess(perm.accessLevel(), Permission.PERM_ADD),
