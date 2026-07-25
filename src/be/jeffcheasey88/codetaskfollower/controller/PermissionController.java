@@ -1,6 +1,6 @@
 package be.jeffcheasey88.codetaskfollower.controller;
 
-import static be.jeffcheasey88.codetaskfollower.tmp.Permission.canAccess;
+import static be.jeffcheasey88.codetaskfollower.tmp.Permission.*;
 import static dev.peerat.framework.RequestType.DELETE;
 import static dev.peerat.framework.RequestType.POST;
 import static dev.peerat.framework.RequestType.PUT;
@@ -97,7 +97,7 @@ public class PermissionController{
 			new PlayerTreasurePermission(
 					perm.entityType(),
 					perm.entityId(),
-					true,
+					isReadOnly(perm.accessLevel()),
 					canAccess(perm.accessLevel(), Permission.PERM_ADD),
 					canAccess(perm.accessLevel(), Permission.PERM_UPDATE),
 					canAccess(perm.accessLevel(), Permission.PERM_DELETE),
@@ -113,7 +113,7 @@ public class PermissionController{
 			return new PlayerPermission(
 					perm.entityId(),
 					getUsername(perm.roleId()),
-					true,
+					isReadOnly(perm.accessLevel()),
 					canAccess(perm.accessLevel(), Permission.PERM_ADD),
 					canAccess(perm.accessLevel(), Permission.PERM_UPDATE),
 					canAccess(perm.accessLevel(), Permission.PERM_DELETE),
@@ -131,7 +131,7 @@ public class PermissionController{
 		return new PlayerPermission(
 				playerId,
 				getUsername(playerId),
-				true,
+				isReadOnly(access),
 				canAccess(access, Permission.PERM_ADD),
 				canAccess(access, Permission.PERM_UPDATE),
 				canAccess(access, Permission.PERM_DELETE),

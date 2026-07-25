@@ -18,6 +18,10 @@ public class Permission{
 		int filter = access&perm;
 		return filter != 0;
 	}
+	
+	public static boolean isReadOnly(int access){
+		return access == 0;
+	}
 
 	public static void giveAccess(String entityType, int entityId, String roleType, int roleId, int accessLevel){
 		TemporalRepository.INSTANCE.updateRequest(
