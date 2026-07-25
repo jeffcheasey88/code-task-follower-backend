@@ -277,10 +277,11 @@ public class TemporalRepository{
 	public static void updateTask(Task task){
 		update(
 				"tasks",
-				List.of("name","description"),
+				List.of("name","description","estimateSeconds"),
 				List.of("id"),
 				param(task.getName()),
 				param(task.getDescription()),
+				param(task.getEstimateSeconds()),
 				param(task.getId())
 		);
 	}
