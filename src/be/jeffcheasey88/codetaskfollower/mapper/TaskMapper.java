@@ -16,7 +16,7 @@ public class TaskMapper extends Mapper<TaskDto, LightTaskDto, Task>{
 			model.getId(),
 			model.getName(),
 			model.getDescription(),
-			0,
+			model.getEstimateSeconds(),
 			null, //model.getState(),
 			model.getTags() == null ? null : tagMapper.toDto(model.getTags()).stream().map(t -> t.getId()).toList(),
 			toDto(model.getDependencies()),
