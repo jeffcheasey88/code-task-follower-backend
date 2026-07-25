@@ -24,6 +24,17 @@ public class AuthController{
 	@Route(path = "/users/register", type = POST)
 	public void register(Context context, AuthDto authDto) throws Exception{
 		if(!config.isRegisterAllow()){
+			User user = context.getUser();
+			if(user != null && user.isAdmin()){
+				Player player = getPlayer(authDto.username());
+				if(player != null){
+					context.response(400);
+					return;
+				}
+				player = new Player(0, authDto.username(), Password.hash(authDto.password()).withArgon2().getResult(), false);
+				context.response(200);
+				return;
+			}
 			context.response(400);
 			return;
 		}
@@ -64,4 +75,5 @@ public class AuthController{
 		if(!Password.check(updatePasswordDto.oldPassword(), player.getPassword()).withArgon2()) throw new HttpError(400);
 		player.setPassword(Password.hash(updatePasswordDto.newPassword()).withArgon2().getResult());
 	}
+	
 }
