@@ -504,7 +504,8 @@ public class TemporalRepository{
 	
 	private static <T> void trickAppend(Supplier<List<T>> getter, Consumer<List<T>> setter, T value){
 		List<T> list = getter.get();
-		if(list == null) setter.accept(list = new LinkedList<T>());
+		System.out.println("debug list="+list);
+		if(list == null) setter.accept(list = new LinkedList<>());
 		list.add(value);
 	}
 	
