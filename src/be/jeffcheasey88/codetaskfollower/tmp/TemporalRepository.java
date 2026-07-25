@@ -504,7 +504,6 @@ public class TemporalRepository{
 	
 	private static <T> void trickAppend(Supplier<List<T>> getter, Consumer<List<T>> setter, T value){
 		List<T> list = getter.get();
-		System.out.println("debug list="+list);
 		if(list == null) setter.accept(list = new LinkedList<>());
 		list.add(value);
 	}
@@ -512,7 +511,7 @@ public class TemporalRepository{
 	private static <T> void trickRemove(Supplier<List<T>> getter, Consumer<List<T>> setter, Predicate<T> filter){
 		List<T> list = getter.get();
 		if(list == null) return;
-		setter.accept(list.stream().filter(filter).toList());
+		setter.accept(new LinkedList<>(list.stream().filter(filter).toList()));
 	}
 
 	interface NewTag{
