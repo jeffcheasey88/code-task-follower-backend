@@ -50,7 +50,7 @@ public class TaskController{
 	public TaskDto getTask(User user, @Argument Task task){
 		if(!canReadTask(user, task.getId())) throw new HttpError(403);
 		TaskDto taskDto = taskMapper.toDto(task);
-		return new TaskDto(taskDto.id(), taskDto.name(), taskDto.description(), taskDto.estimateSeconds(), TemporalRepository.INSTANCE.selectStateForTask(taskDto.id()).getId(), getTags(taskDto.id()).stream().map(t -> t.getId()).toList(), null, null, null, null, null);
+		return new TaskDto(taskDto.id(), taskDto.name(), taskDto.description(), taskDto.estimateSeconds(), selectStateForTask(taskDto.id()).getId(), getTags(taskDto.id()).stream().map(t -> t.getId()).toList(), null, null, null, null, null);
 	}
 
 	@Route(path = "/tasks", type = POST, needLogin = true)

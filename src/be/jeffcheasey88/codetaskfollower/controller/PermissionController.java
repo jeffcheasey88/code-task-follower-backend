@@ -69,7 +69,7 @@ public class PermissionController{
 	
 	@Route(path="/players/search"+QueryParameters.QUERY_REGEX, needLogin = true)
 	public List<PlayerDto> getPlayersByName(Matcher matcher, User user) throws UnsupportedEncodingException{
-		QueryParameters parameters = new QueryParameters(matcher.group(1));
+		QueryParameters parameters = new QueryParameters(matcher.group(2));
 		String nameQuery = parameters.getValue("name");
 		if(nameQuery == null) throw new HttpError(400);
 		String query = nameQuery.toLowerCase();
@@ -224,11 +224,11 @@ public class PermissionController{
 	}
 	
 	private int toAccess(PlayerPermissionDto permissionDto){
-		if(permissionDto.admin()) return Permission.PERM_ADMIN;
+		if(permissionDto.admin() != null && permissionDto.admin()) return Permission.PERM_ADMIN;
 		int access = 0;
-		if(permissionDto.add()) access+=Permission.PERM_ADD;
-		if(permissionDto.update()) access+=Permission.PERM_UPDATE;
-		if(permissionDto.delete()) access+=Permission.PERM_DELETE;
+		if(permissionDto.add() != null && permissionDto.add()) access+=Permission.PERM_ADD;
+		if(permissionDto.update() != null && permissionDto.update()) access+=Permission.PERM_UPDATE;
+		if(permissionDto.delete() != null && permissionDto.delete()) access+=Permission.PERM_DELETE;
 		return access;
 	}
 }

@@ -40,7 +40,7 @@ public class Permission{
 	
 	public static void revokeAccess(String entityType, int entityId, String roleType, int roleId){
 		TemporalRepository.INSTANCE.updateRequest(
-				"DELETE FROM "+entityType+"Access WHERE roleType = ? AND roleId = ? AND "+entityType.toLowerCase()+"Id = ?)",
+				"DELETE FROM "+entityType+"Access WHERE roleType = ? AND roleId = ? AND "+entityType.toLowerCase()+"Id = ?",
 				new SqlParam("String",roleType),
 				new SqlParam("int",roleId),
 				new SqlParam("int",entityId)
