@@ -103,6 +103,20 @@ public class PermissionController{
 		).toList();
 	}
 	
+	@Route(path = "/projects/(\\d+)/player", needLogin = true)
+	public PlayerPermissionDto getProjectPlayer(User user, @Argument int projectId){
+		int access = Permission.getAccess("player", user.getId(), "Project", projectId);
+		return new PlayerPermissionDto(
+				user.getId(),
+				user.getName(),
+				isReadOnly(access),
+				canAccess(access, Permission.PERM_ADD),
+				canAccess(access, Permission.PERM_UPDATE),
+				canAccess(access, Permission.PERM_DELETE),
+				canAccess(access, Permission.PERM_ADMIN)
+		);
+	}
+	
 	@Route(path = "/projects/(\\d+)/players", needLogin = true)
 	public List<PlayerPermissionDto> getProjectPlayers(User user, @Argument int projectId){
 		if(!ProjectController.canAdminProject(user, projectId)) throw new HttpError(403);
@@ -155,6 +169,20 @@ public class PermissionController{
 		if(!ProjectController.canAdminProject(user, projectId)) throw new HttpError(403);
 		if(Permission.getAccess("player", playerId, "Project", projectId) < 0) throw new HttpError(400);
 		Permission.revokeAccess("Project", projectId, "player", playerId);
+	}
+	
+	@Route(path = "/tasks/(\\d+)/player", needLogin = true)
+	public PlayerPermissionDto getTaskPlayer(User user, @Argument int taskId){
+		int access = Permission.getAccess("player", user.getId(), "Task", taskId);
+		return new PlayerPermissionDto(
+				user.getId(),
+				user.getName(),
+				isReadOnly(access),
+				canAccess(access, Permission.PERM_ADD),
+				canAccess(access, Permission.PERM_UPDATE),
+				canAccess(access, Permission.PERM_DELETE),
+				canAccess(access, Permission.PERM_ADMIN)
+		);
 	}
 	
 	@Route(path = "/tasks/(\\d+)/players", needLogin = true)
