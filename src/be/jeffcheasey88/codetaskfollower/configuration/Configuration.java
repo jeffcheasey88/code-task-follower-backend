@@ -26,6 +26,11 @@ public class Configuration{
 	
 	private String defaultUserName = "admin";
 	private String defaultUserPassword = "admin";
+	
+	private int tcp_port = 8001;
+	private boolean use_ssl = false;
+	private String ssl_keystore;
+	private String ssl_keystorePasswd;
 
 	public Configuration(){}
 	
@@ -102,6 +107,22 @@ public class Configuration{
 		return this.defaultUserPassword;
 	}
 	
+	public String getSslKeystore(){
+		return this.ssl_keystore;
+	}
+	
+	public String getSslKeystorePasswd(){
+		return this.ssl_keystorePasswd;
+	}
+
+	public int getTcpPort(){
+		return this.tcp_port;
+	}
+
+	public boolean useSsl(){
+		return this.use_ssl;
+	}
+	
 	
 	@Repeatable(Aliases.class)
 	@Retention(RetentionPolicy.RUNTIME)
@@ -121,6 +142,5 @@ public class Configuration{
 		Alias[] value();
 		
 	}
-	
 	
 }

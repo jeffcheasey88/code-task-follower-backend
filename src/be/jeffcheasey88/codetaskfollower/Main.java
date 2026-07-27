@@ -125,7 +125,8 @@ public class Main{
 		}
 		System.out.println();
 		
-		router.listen(8001, false);
+		if(config.useSsl()) router.configureSSL(config.getSslKeystore(), config.getSslKeystorePasswd());
+		router.listen(config.getTcpPort(), config.useSsl());
 	}
 	
 	private static Configuration loadConfig(String[] args) throws Exception{
