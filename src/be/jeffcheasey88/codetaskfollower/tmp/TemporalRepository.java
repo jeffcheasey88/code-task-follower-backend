@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -329,6 +330,17 @@ public class TemporalRepository{
 				param(project.getDescription()),
 				param(project.getId())
 		);
+	}
+	
+	
+	
+	//others
+	public static void addDependency(Task base, Task dependency){
+		insert("TaskDependencies", Arrays.asList("baseId","dependId"), param(base.getId()), param(dependency.getId()));
+	}
+	
+	public static void removeDependency(Task base, Task dependency){
+		delete("TaskDependencies", Arrays.asList("baseId","dependId"), param(base.getId()), param(dependency.getId()));
 	}
 	
 	public static <T> List<T> listSelect(String sqlRequest, Converter<ResultSet, T> mapper, SqlParam... params){

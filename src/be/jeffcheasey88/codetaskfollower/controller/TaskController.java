@@ -108,6 +108,18 @@ public class TaskController{
 		return getTags(taskId);
 	}
 	
+	@Route(path = "/tasks/(\\d+)/dependencies/(\\d+)", type = POST, needLogin = true)
+	public void addTaskDependencies(User user, @Argument Task task, @Argument(2) Task dependency){
+		if(!canUpdateTask(user, task.getId())) throw new HttpError(403);
+		TemporalRepository.addDependency(task, dependency);
+	}
+	
+	@Route(path = "/tasks/(\\d+)/dependencies/(\\d+)", type = DELETE, needLogin = true)
+	public void removeTaskDependencies(User user, @Argument Task task, @Argument(2) Task dependency){
+		if(!canUpdateTask(user, task.getId())) throw new HttpError(403);
+		TemporalRepository.removeDependency(task, dependency);
+	}
+	
 	public List<TagDto> getTags(int taskId){
 		return tagMapper.toDto(selectTags(taskId));
 	}
