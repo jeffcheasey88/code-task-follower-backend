@@ -9,6 +9,8 @@ import static dev.peerat.framework.RequestType.PUT;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -76,16 +78,18 @@ public class Main{
 		router.setAuthenticator(new Authenticator(new HashSet<>()));
 		router.bind(new ModelBinder(injector));
 		
+		final SimpleDateFormat dateFormat = new SimpleDateFormat("[dd/MM/yyyy HH:mm:ss] ");
+		
 		new Thread(() -> router.getLogger().listen(context -> {
 				boolean colorAccepted = config.isColorAllow();
 				RequestType type = context.getType();
 				if(type.equals(RequestType.OPTIONS)) return;
-				String prefix = "";
+				String prefix = dateFormat.format(new Date());
 				if(context.isLogged()){
 					if(colorAccepted) prefix+=COLOR_BLUE;
 					prefix += "("+context.<User>getUser().getName()+")";
 					if(colorAccepted) prefix+=COLOR_RESET;
-					prefix+=" ";
+					prefix += " ";
 				}
 				int responseCode = context.getResponseCode();
 				if(colorAccepted){
@@ -103,11 +107,13 @@ public class Main{
 		)).start();
 		
 		new Thread(() ->  router.getExceptionLogger().listen(throwable -> {
+			String prefix = dateFormat.format(new Date());
 			if(throwable instanceof AuthException){
-				System.err.println("erreur d'authentification");
+				System.err.println(prefix+"erreur d'authentification");
 				return;
 			}
 			if(throwable instanceof HttpError) return;
+			System.err.println(prefix+"Log Error:");
 			throwable.printStackTrace();
 		}, Throwable::printStackTrace)).start();
 		
