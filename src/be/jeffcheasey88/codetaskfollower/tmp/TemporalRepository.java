@@ -260,7 +260,7 @@ public class TemporalRepository{
 	public static List<Task> selectTasks(int projectId){
 		return listSelect(
 				"SELECT t.* FROM tasks t JOIN TaskProject tp ON tp.taskId = t.id WHERE tp.projectId = ?",
-				r -> trickTask(r.getInt("t.id"), r.getString("t.name")),
+				r -> trickTask(r.getInt("t.id"), r.getString("t.name"), r.getInt("t.estimateSeconds")),
 				param(projectId)
 				);
 	}
@@ -535,8 +535,8 @@ public class TemporalRepository{
 	interface NewTask{
 		Task create(int id, String name, String description, int estimateSeconds, List<Tag> tags, List<Task> dependencies, List<Project> projects, List<Commit> commits, List<Branch> branches, List<Code> codes);
 	}
-	private static Task trickTask(int id, String name){
+	private static Task trickTask(int id, String name, int estimateSeconds){
 		NewTask creator = Task::new;
-		return creator.create(id, name, null, 0, null, null, null, null, null, null);
+		return creator.create(id, name, null, estimateSeconds, null, null, null, null, null, null);
 	}
 }
