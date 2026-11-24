@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.net.ssl.SSLException;
+
 import com.password4j.Password;
 
 import be.jeffcheasey88.codetaskfollower.configuration.ArgumentConfiguration;
@@ -108,6 +110,7 @@ public class Main{
 		
 		new Thread(() ->  router.getExceptionLogger().listen(throwable -> {
 			String prefix = dateFormat.format(new Date());
+			if(throwable instanceof SSLException) return;
 			if(throwable instanceof AuthException){
 				System.err.println(prefix+"erreur d'authentification");
 				return;
@@ -140,7 +143,8 @@ public class Main{
 				try {
 					Thread.sleep(2000);
 					
-					router.configureSSL(null, null);
+					System.clearProperty("javax.net.ssl.keyStore");
+					System.clearProperty("javax.net.ssl.keyStorePassword");
 					
 					
 				} catch (InterruptedException e) {
