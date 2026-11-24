@@ -132,6 +132,24 @@ public class Main{
 		System.out.println();
 		
 		if(config.useSsl()) router.configureSSL(config.getSslKeystore(), config.getSslKeystorePasswd());
+		
+		new Thread(){
+			@Override
+			public void run(){
+				
+				try {
+					Thread.sleep(2000);
+					
+					router.configureSSL(null, null);
+					
+					
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+			}
+		}.start();
+		
 		router.listen(config.getTcpPort(), config.useSsl());
 	}
 	
